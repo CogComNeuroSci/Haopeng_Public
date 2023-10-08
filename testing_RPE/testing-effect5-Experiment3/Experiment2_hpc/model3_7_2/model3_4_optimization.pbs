@@ -1,0 +1,15 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=16
+#PBS -l mem=16gb
+#PBS -l walltime=10:00:00
+
+#PBS -m ae
+#PBS -M haopeng.chen@ugent.be
+#PBS -N E2_model7_optimization
+
+module load Anaconda3/2023.03-1
+
+cd $PBS_O_WORKDIR
+
+python ./model3_4_optimization.py
+
