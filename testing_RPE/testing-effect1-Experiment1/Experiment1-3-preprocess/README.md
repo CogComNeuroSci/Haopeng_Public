@@ -1,13 +1,10 @@
 Preprocessing before the formal data analysis
 
 "preprocess.py"
-This is the first preprocessing stratagy, which is also the stratagy used in the paper. In this preprocessing, we did not delete the word pairs that were correctly recognized in phase 4, but incorrectly recognized in phase 5.
-
-"preprocess_stratagy2.py"
-This is the second preprocessing stratagy. In this preprocessing, we delete the word pairs that were correctly recognized in phase 4, but incorrectly recognized in phase 5.
+This is the script for preprocess.
 
 "plot.py"
-In this script, we draw the distribution of trials in each experimental condition. Besides, we try to use a different stratagy (delete high confidence trials in phase 2) to filter the pre-learning from phase 1, and draw a figure to show the final behavioral pattern. 
+This is the script to draw the figures. 
 
 "data_preprocess.csv"
 This is the preprocessed data of all participants

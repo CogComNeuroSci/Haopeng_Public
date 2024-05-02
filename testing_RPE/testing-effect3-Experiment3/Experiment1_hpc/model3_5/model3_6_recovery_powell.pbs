@@ -1,0 +1,14 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=16
+#PBS -l mem=16gb
+#PBS -l walltime=20:00:00
+#PBS -m ae
+#PBS -M haopeng.chen@ugent.be
+#PBS -N E1_model5_recovery_powell
+
+module load Anaconda3/2023.03-1
+
+cd $PBS_O_WORKDIR
+
+python ./model3_6_recovery_powell.py
+

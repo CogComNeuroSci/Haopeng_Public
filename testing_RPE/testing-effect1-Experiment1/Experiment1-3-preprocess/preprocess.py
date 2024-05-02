@@ -92,7 +92,7 @@ data_all['learning_method'].replace([1,4], [0,1], inplace=True)
 ## replace the values of confidence
 data_all.loc[:, ['confidence2', 'confidence3', 'confidence4', 'confidence5', 'confidence']] = (data_all.loc[:, ['confidence2', 'confidence3', 'confidence4', 'confidence5', 'confidence']] - 1)/4
 
-## set the confidence in the studying condition as 4
+## set the confidence in the studying condition as 1
 data_all.loc[data_all['learning_method']==0, 'confidence'] = 1
 
 ## calculate the srpe and urpe
@@ -161,9 +161,8 @@ data_all.to_csv('data_preprocess_higher_than_0.34.csv')
 
 
 
-
 ### main preprocess
-#data_all = data_all[data_all['reward2']!=4]
+data_all = data_all[data_all['reward2']!=4]
 
 
 
@@ -186,7 +185,7 @@ plt.rcParams['ytick.labelsize'] = 12
 fig2 = sns.catplot(data=data_plot_srpe, x='SRPE', y='Accuracy', hue='Testing Vs Studying' 
                    ,col='Feedback(Phase3)'
                    ,row='Feedback(Phase2)'
-                   ,kind='bar', errorbar='se')
+                   ,kind='bar', errorbar='se', sharex=False)
 
 fig2.fig.text(-0.2, 0.8, 'Feedback(phase2)=0', size=15)
 fig2.fig.text(-0.2, 0.3, 'Feedback(phase2)=1', size=15)
@@ -194,6 +193,8 @@ fig2.fig.text(0.2, 1.05, 'Feedback(phase3)=0', size=15)
 fig2.fig.text(0.6, 1.05, 'Feedback(phase3)=1', size=15)
 
 fig2.set_xlabels('RPE')
+#fig2.set(yticks=np.arange(0, 120, 20), ylim=[0, 120])
+
 fig2.savefig('figs/srpe-and-testing.tif', dpi=300)
 
 

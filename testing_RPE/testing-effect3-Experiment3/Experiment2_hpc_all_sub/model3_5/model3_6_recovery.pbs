@@ -1,0 +1,13 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=16
+#PBS -l mem=16gb
+#PBS -l walltime=15:00:00
+#PBS -m ae
+#PBS -M haopeng.chen@ugent.be
+
+module load Anaconda3/2020.07
+
+cd $PBS_O_WORKDIR
+
+python ./model3_6_recovery.py
+
