@@ -100,147 +100,31 @@ data_all['srpe'] = data_all['reward'] - data_all['confidence']
 data_all['urpe'] = data_all['srpe'].abs()
 
 ## cauculate the final accuracy
-# 4,4=1; 0,0=0; 0,4=0; 4,0=-1
-data_all.index = range(data_all.shape[0])
-for i in range(data_all.shape[0]):
-    if data_all.loc[i, 'reward4'] == 1 and data_all.loc[i, 'reward5'] == 1:
-        data_all.loc[i, 'accuracy'] = 1
-    elif data_all.loc[i, 'reward4'] == 0 and data_all.loc[i, 'reward5'] == 0:
-        data_all.loc[i, 'accuracy'] = 0
-    elif data_all.loc[i, 'reward4'] == 0 and data_all.loc[i, 'reward5'] == 1:
-        data_all.loc[i, 'accuracy'] = 0
-    elif data_all.loc[i, 'reward4'] == 1 and data_all.loc[i, 'reward5'] == 0:
-        data_all.loc[i, 'accuracy'] = 0
-    else:
-        print('error')
-        
+# binary accuracy
+data_all['accuracy_binary'] = data_all['reward4'] + data_all['reward5'] - 1
+data_all.loc[data_all['accuracy_binary']==-1, 'accuracy_binary'] = 0
+# continuous accuracy
+data_all['accuracy_continuous'] = (data_all['reward4'] + data_all['reward5'])/2
+ 
 
-#data_all = data_all[data_all['accuracy']!=-1]
+### calculate the accuracy of every participant
+## binary acc
+# individual accuracy
+data_acc = data_all.groupby(by=['participant'])['accuracy_binary'].mean()
+data_acc = data_acc.reset_index()
+data_acc.columns = ['participant', 'individual_binary_acc']
+# merge the data
+data_all = data_all.merge(data_acc, how='left', on='participant')
 
-
+## continuous acc
+# individual accuracy
+data_acc = data_all.groupby(by=['participant'])['accuracy_continuous'].mean()
+data_acc = data_acc.reset_index()
+data_acc.columns = ['participant', 'individual_continuous_acc']
+# merge the data
+data_all = data_all.merge(data_acc, how='left', on='participant')
 
 
 ### save the data
 data_all.to_csv('data_preprocess.csv')
-
-
-
-### calculate the accuracy of every participant
-accuracy_mean = data_all.groupby(by=['participant'])['accuracy'].mean()
-accuracy_mean = accuracy_mean.reset_index()
-
-## distribution of the accuracy
-fig1 = sns.displot(data=accuracy_mean, x='accuracy', bins=20)
-
-## find the participants whose accuracy is lower than 34%
-poor = accuracy_mean[accuracy_mean['accuracy']<=0.34]
-print(poor['participant'].values)
-print(poor.shape[0])
-# participant: 3 11 13 15 16 21 22 25 35 39 40 43 44 49 62 65 67 68 69 70 72
-# number: 21
-
-
-## delete the poor data
-data_all.index = range(data_all.shape[0])
-for sub in poor['participant']:
-    data_all = data_all[data_all['participant']!=sub]
-
-
-
-
-### remaining subjects
-sub_remain = data_all['participant'].unique()
-sub_remain_number = sub_remain.shape[0]
-print(sub_remain_number)
-# number: 55
-
-
-
-### save the data
-data_all.to_csv('data_preprocess_higher_than_0.34.csv')    
-
-
-
-### main preprocess
-data_all = data_all[data_all['reward2']!=4]
-
-
-
-
-### fig: testing effect and srpe
-## reframe the data as subject level
-data_plot_srpe = data_all.groupby(by=['participant', 'learning_method', 'srpe', 'reward', 'reward2'])['accuracy'].mean()
-data_plot_srpe = data_plot_srpe.reset_index()
-data_plot_srpe.columns = ['participants', 'Testing Vs Studying', 'SRPE', 'Feedback(Phase3)', 'Feedback(Phase2)', 'Accuracy']
-data_plot_srpe['Testing Vs Studying'].replace([0, 1], ['Studying', 'Testing'], inplace=True)
-
-#plt.rcParams['font.size'] = 8
-plt.rcParams['axes.labelsize'] = 15
-plt.rcParams['legend.fontsize'] = 15
-plt.rcParams['legend.title_fontsize'] = 15
-plt.rcParams['xtick.labelsize'] = 12
-plt.rcParams['ytick.labelsize'] = 12
-
-
-fig2 = sns.catplot(data=data_plot_srpe, x='SRPE', y='Accuracy', hue='Testing Vs Studying' 
-                   ,col='Feedback(Phase3)'
-                   ,row='Feedback(Phase2)'
-                   ,kind='bar', errorbar='se', sharex=False)
-
-fig2.fig.text(-0.2, 0.8, 'Feedback(phase2)=0', size=15)
-fig2.fig.text(-0.2, 0.3, 'Feedback(phase2)=1', size=15)
-fig2.fig.text(0.2, 1.05, 'Feedback(phase3)=0', size=15)
-fig2.fig.text(0.6, 1.05, 'Feedback(phase3)=1', size=15)
-
-fig2.set_xlabels('RPE')
-#fig2.set(yticks=np.arange(0, 120, 20), ylim=[0, 120])
-
-fig2.savefig('figs/srpe-and-testing.tif', dpi=300)
-
-
-
-"""
-### fig: the correlation between confidence in phase 2 and confidence in phase 3
-## reframe the data as subject level
-data_plot_srpe = data_all.groupby(by=['participant', 'learning_method', 'srpe', 'reward', 'reward2'])['confidence2'].mean()
-data_plot_srpe = data_plot_srpe.reset_index()
-data_plot_srpe.columns = ['participants', 'Testing Vs Studying', 'SRPE', 'Feedback(Phase3)', 'Feedback(Phase2)', 'Confidence (phase2)']
-data_plot_srpe['Testing Vs Studying'].replace([0, 1], ['Studying', 'Testing'], inplace=True)
-
-#plt.rcParams['font.size'] = 8
-plt.rcParams['axes.labelsize'] = 15
-plt.rcParams['legend.fontsize'] = 15
-plt.rcParams['legend.title_fontsize'] = 15
-plt.rcParams['xtick.labelsize'] = 12
-plt.rcParams['ytick.labelsize'] = 12
-
-
-fig3 = sns.catplot(data=data_plot_srpe, x='SRPE', y='Confidence (phase2)', hue='Testing Vs Studying' 
-                   ,col='Feedback(Phase3)'
-                   ,row='Feedback(Phase2)'
-                   ,kind='bar', errorbar='se')
-
-fig3.fig.text(-0.2, 0.8, 'Feedback(phase2)=0', size=15)
-fig3.fig.text(-0.2, 0.3, 'Feedback(phase2)=4', size=15)
-fig3.fig.text(0.2, 1.05, 'Feedback(phase3)=0', size=15)
-fig3.fig.text(0.6, 1.05, 'Feedback(phase3)=4', size=15)
-
-
-fig3.savefig('figs/confidence_phase2_phase3.tif', dpi=300)
-"""
-
-
-
-"""
-### the distrubution of the confidence in phase 2 (reward2=0, srpe=4)
-data_all_dis = data_all.copy()
-data_all_dis = data_all_dis[data_all_dis['reward2']==0]
-data_all_dis = data_all_dis[data_all_dis['srpe']==4]
-data_all_dis['confidence2'] = data_all_dis['confidence2']/4
-
-fig4 = sns.displot(data=data_all_dis, x='confidence2', kind='ecdf')
-fig4.set_xlabels('Confidence in phase 2')
-fig4.set(xticks=[0, 0.25, 0.5, 0.75, 1])
-fig4.savefig('figs/distribution_of_confidence2.tif', dpi=300)
-"""
 

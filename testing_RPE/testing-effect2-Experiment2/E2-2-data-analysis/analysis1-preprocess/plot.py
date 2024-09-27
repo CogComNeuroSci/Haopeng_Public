@@ -20,16 +20,34 @@ import os
 ###############################
 ######### data ################
 ###############################
-## data without removing subjects?
-full_data = False
-
-if full_data:
-    data_all = pd.read_csv('data_preprocess.csv')
-else:
-    data_all = pd.read_csv('data_preprocess_higher_than_0.34.csv')
-
+full_data = True
+binary = False
 ## filter stratagy
-filt = 'no' # correct, no, high_conf
+filt = 'correct' # correct, no, high_conf
+
+## load data
+data_all = pd.read_csv('data_preprocess.csv')
+
+## remove subjects? binary or continuous?
+if full_data and binary:
+    print('full data')
+    print('binary accuracy')
+    data_all['accuracy'] = data_all['accuracy_binary']
+elif full_data and not binary:
+    print('full data')
+    print('continuous accuracy')
+    data_all['accuracy'] = data_all['accuracy_continuous']
+elif not full_data and binary:
+    print('good data')
+    print('binary accuracy')
+    data_all = data_all.loc[data_all['individual_binary_acc']>=0.34, :]
+    data_all['accuracy'] = data_all['accuracy_binary']
+elif not full_data and not binary:
+    print('good data')
+    print('continuous accuracy')
+    data_all = data_all.loc[data_all['individual_continuous_acc']>=0.34, :]
+    data_all['accuracy'] = data_all['accuracy_continuous']
+
 
 if filt == 'correct':
     data_all_plot = data_all.copy()
@@ -58,8 +76,12 @@ data_all_plot['Feedback'].replace([0, 1], ['Negative', 'Positive'], inplace=True
 ##############################
 
 ######## setting #############
-plt.rcParams['font.size'] = 24
-plt.rcParams['legend.fontsize'] = 20
+plt.rcParams.update({
+    'font.size': 24,
+    'axes.labelsize': 24,
+    'xtick.labelsize': 24,
+    'ytick.labelsize': 24
+    })
 
 ##### first subplot #######
 fig1, ax1 = plt.subplots(dpi=300)
@@ -127,7 +149,7 @@ sns.barplot(data=data_plot, x='Confidence', y='Human accuracy', hue='Testing Vs 
 
 i = 0
 for patch in ax2.patches:
-    if i == 9:
+    if i == 5:
         edge_color = palette['Studying']
     else:
         edge_color = palette['Testing']  # Get the edge color from the palette
@@ -146,11 +168,16 @@ legend_handles = [
 ]
 
 # Set the legend with custom handles and labels
-ax2.legend(handles=legend_handles, title='', fontsize=10, bbox_to_anchor=[0.9, 1.1])
+ax2.legend(handles=legend_handles, title='', fontsize=10, bbox_to_anchor=[1.15, 1.1])
 #ax2.legend_ = None
 ax2.set_ylabel('')
 ax2.set(yticks=np.arange(0, 120, 20), ylim=[0, 120])
 ax2.set_title('Feedback: Positive', fontsize=24)
+
+# set the ticks
+bar_width = 0.40  # Adjust bar width as needed
+ticks = (np.array([0, 1, 2, 3]) - bar_width/2).tolist() + [4]
+ax2.set_xticks(ticks)
 
 if full_data:
     fig2.savefig('figs/positive_confidence_all_sub.tif', dpi=300)

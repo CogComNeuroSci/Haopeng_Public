@@ -1,13 +1,7 @@
-The models to simulate the behavioral patterns of two experiments.
+In this Experiment, we check the testing effect without feedback. This could serve as a baseline after initial learning and before feedback manipulation.
 
-"Experiment1_hpc"
-Models for Experiment 1.
+"data_analysis"
+This is the folder for data analysis.
 
-
-"Experiment2_hpc"
-Models for Experiment 2.
-
-"model_comparison"
-Model comparison by wAIC.
-
-
+"Experiment"
+This is the script of Experimental procedure.

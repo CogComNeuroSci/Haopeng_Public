@@ -1,5 +1,13 @@
-"data_all"
-This is the preprocessed behavioral data
+The models to simulate the behavioral patterns of two experiments.
 
-"formal_analysis"
-Statistical analysis
+"Experiment1_hpc"
+Models for Experiment 1.
+
+
+"Experiment2_hpc"
+Models for Experiment 2.
+
+"model_comparison"
+Model comparison by wAIC.
+
+

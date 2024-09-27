@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset='utf-8'>
+<title></title>
+<style>
+body, pre {font-size: 10.5pt; font-family: Times New Roman;}
+p {margin: 0px;}
+table {border-collapse: collapse; border-spacing: 0px; color: #000000;
+       border-top: 2px solid #000000; border-bottom: 2px solid #000000;}
+table thead th {border-bottom: 1px solid #000000;}
+table th, table td {padding-left: 5px; padding-right: 5px; height: 19px;}
+</style>
+</head>
+
+<body>
+<p>Descriptive Statistics:</p>
+<table>
+<thead>
+<tr> <th align='left'></th> <th align='right'>N</th> <th align='right'>Mean</th> <th align='right'>SD</th> <th align='right'>|</th> <th align='right'>Median</th> <th align='right'>Min</th> <th align='right'>Max</th> <th align='right'>Skewness</th> <th align='right'>Kurtosis</th> </tr>
+</thead>
+<tbody>
+<tr> <td align='left'>Submission.id*</td> <td align='right'>62</td> <td align='right'>31.50</td> <td align='right'>18.04</td> <td align='right'>|</td> <td align='right'>31.50</td> <td align='right'>1.00</td> <td align='right'>62.00</td> <td align='right'>0.00</td> <td align='right'>–1.26</td> </tr>
+<tr> <td align='left'>Participant.id*</td> <td align='right'>62</td> <td align='right'>31.50</td> <td align='right'>18.04</td> <td align='right'>|</td> <td align='right'>31.50</td> <td align='right'>1.00</td> <td align='right'>62.00</td> <td align='right'>0.00</td> <td align='right'>–1.26</td> </tr>
+<tr> <td align='left'>Status*</td> <td align='right'>62</td> <td align='right'>1.00</td> <td align='right'>0.00</td> <td align='right'>|</td> <td align='right'>1.00</td> <td align='right'>1.00</td> <td align='right'>1.00</td> <td align='right'>NaN</td> <td align='right'>NaN</td> </tr>
+<tr> <td align='left'>Custom.study.tncs.accepted.at*</td> <td align='right'>62</td> <td align='right'>1.00</td> <td align='right'>0.00</td> <td align='right'>|</td> <td align='right'>1.00</td> <td align='right'>1.00</td> <td align='right'>1.00</td> <td align='right'>NaN</td> <td align='right'>NaN</td> </tr>
+<tr> <td align='left'>Started.at*</td> <td align='right'>62</td> <td align='right'>31.50</td> <td align='right'>18.04</td> <td align='right'>|</td> <td align='right'>31.50</td> <td align='right'>1.00</td> <td align='right'>62.00</td> <td align='right'>0.00</td> <td align='right'>–1.26</td> </tr>
+<tr> <td align='left'>Completed.at*</td> <td align='right'>62</td> <td align='right'>31.50</td> <td align='right'>18.04</td> <td align='right'>|</td> <td align='right'>31.50</td> <td align='right'>1.00</td> <td align='right'>62.00</td> <td align='right'>0.00</td> <td align='right'>–1.26</td> </tr>
+<tr> <td align='left'>Reviewed.at*</td> <td align='right'>62</td> <td align='right'>31.50</td> <td align='right'>18.04</td> <td align='right'>|</td> <td align='right'>31.50</td> <td align='right'>1.00</td> <td align='right'>62.00</td> <td align='right'>0.00</td> <td align='right'>–1.26</td> </tr>
+<tr> <td align='left'>Archived.at*</td> <td align='right'>62</td> <td align='right'>31.50</td> <td align='right'>18.04</td> <td align='right'>|</td> <td align='right'>31.50</td> <td align='right'>1.00</td> <td align='right'>62.00</td> <td align='right'>0.00</td> <td align='right'>–1.26</td> </tr>
+<tr> <td align='left'>Time.taken</td> <td align='right'>62</td> <td align='right'>4749.32</td> <td align='right'>1947.45</td> <td align='right'>|</td> <td align='right'>3999.50</td> <td align='right'>2006.00</td> <td align='right'>10040.00</td> <td align='right'>0.97</td> <td align='right'>–0.00</td> </tr>
+<tr> <td align='left'>Completion.code*</td> <td align='right'>62</td> <td align='right'>1.02</td> <td align='right'>0.13</td> <td align='right'>|</td> <td align='right'>1.00</td> <td align='right'>1.00</td> <td align='right'>2.00</td> <td align='right'>7.50</td> <td align='right'>55.10</td> </tr>
+<tr> <td align='left'>Total.approvals</td> <td align='right'>62</td> <td align='right'>800.45</td> <td align='right'>1554.21</td> <td align='right'>|</td> <td align='right'>227.50</td> <td align='right'>0.00</td> <td align='right'>8830.00</td> <td align='right'>3.81</td> <td align='right'>15.51</td> </tr>
+<tr> <td align='left'>Handedness*</td> <td align='right'>62</td> <td align='right'>2.85</td> <td align='right'>0.51</td> <td align='right'>|</td> <td align='right'>3.00</td> <td align='right'>1.00</td> <td align='right'>3.00</td> <td align='right'>–3.21</td> <td align='right'>8.67</td> </tr>
+<tr> <td align='left'>Literacy.difficulties*</td> <td align='right'>62</td> <td align='right'>1.00</td> <td align='right'>0.00</td> <td align='right'>|</td> <td align='right'>1.00</td> <td align='right'>1.00</td> <td align='right'>1.00</td> <td align='right'>NaN</td> <td align='right'>NaN</td> </tr>
+<tr> <td align='left'>Age</td> <td align='right'>62</td> <td align='right'>29.97</td> <td align='right'>6.02</td> <td align='right'>|</td> <td align='right'>30.00</td> <td align='right'>18.00</td> <td align='right'>40.00</td> <td align='right'>–0.28</td> <td align='right'>–0.98</td> </tr>
+<tr> <td align='left'>Sex*</td> <td align='right'>62</td> <td align='right'>1.61</td> <td align='right'>0.49</td> <td align='right'>|</td> <td align='right'>2.00</td> <td align='right'>1.00</td> <td align='right'>2.00</td> <td align='right'>–0.45</td> <td align='right'>–1.82</td> </tr>
+<tr> <td align='left'>Ethnicity.simplified*</td> <td align='right'>62</td> <td align='right'>3.65</td> <td align='right'>1.58</td> <td align='right'>|</td> <td align='right'>5.00</td> <td align='right'>1.00</td> <td align='right'>5.00</td> <td align='right'>–0.42</td> <td align='right'>–1.62</td> </tr>
+<tr> <td align='left'>Country.of.birth*</td> <td align='right'>62</td> <td align='right'>6.60</td> <td align='right'>1.53</td> <td align='right'>|</td> <td align='right'>7.00</td> <td align='right'>1.00</td> <td align='right'>8.00</td> <td align='right'>–1.50</td> <td align='right'>2.26</td> </tr>
+<tr> <td align='left'>Country.of.residence*</td> <td align='right'>62</td> <td align='right'>1.32</td> <td align='right'>0.47</td> <td align='right'>|</td> <td align='right'>1.00</td> <td align='right'>1.00</td> <td align='right'>2.00</td> <td align='right'>0.74</td> <td align='right'>–1.47</td> </tr>
+<tr> <td align='left'>Nationality*</td> <td align='right'>62</td> <td align='right'>4.79</td> <td align='right'>1.22</td> <td align='right'>|</td> <td align='right'>5.00</td> <td align='right'>1.00</td> <td align='right'>6.00</td> <td align='right'>–1.00</td> <td align='right'>0.18</td> </tr>
+<tr> <td align='left'>Language*</td> <td align='right'>62</td> <td align='right'>1.00</td> <td align='right'>0.00</td> <td align='right'>|</td> <td align='right'>1.00</td> <td align='right'>1.00</td> <td align='right'>1.00</td> <td align='right'>NaN</td> <td align='right'>NaN</td> </tr>
+<tr> <td align='left'>Student.status*</td> <td align='right'>62</td> <td align='right'>2.29</td> <td align='right'>0.55</td> <td align='right'>|</td> <td align='right'>2.00</td> <td align='right'>1.00</td> <td align='right'>3.00</td> <td align='right'>0.01</td> <td align='right'>–0.63</td> </tr>
+<tr> <td align='left'>Employment.status*</td> <td align='right'>62</td> <td align='right'>3.52</td> <td align='right'>1.78</td> <td align='right'>|</td> <td align='right'>3.00</td> <td align='right'>1.00</td> <td align='right'>6.00</td> <td align='right'>0.21</td> <td align='right'>–1.60</td> </tr>
+</tbody>
+</table>
+<p></p>
+</body>
+
+</html>

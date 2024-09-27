@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>My experiment</title>
+    <script src="https://unpkg.com/jspsych@7.3.1"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-slider-response@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-image-keyboard-response@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-fullscreen@1.2.1"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-browser-check@1.0.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-call-function@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-instructions@1.1.4"></script>
+    <link href="https://unpkg.com/jspsych@7.3.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+    
+
+    <style>
+      span {
+        font-size:30px;
+      }
+
+      li {
+        text-align: left;
+      }
+
+      ul {
+        list-style: none;
+      }
+
+      #fix {
+        font-size: 60px;
+        font-weight: bold
+      }
+
+      #active_option {
+        font-size: 30px;
+        outline: 0.8px solid rgb(0, 0, 0);
+        margin-top: 5px;
+        padding: 10px;
+      }
+
+      #unactive_option{
+        font-size: 30px;
+        margin-top: 4px;
+        padding: 10px;
+      }
+
+      #option {
+        font-size:30px;
+        margin-top: 4px;
+        padding: 10px;
+      }
+
+      #feedback {
+        font-size:30px;
+      }
+
+      #correct{
+        font-size:30px;
+        color: green;
+      }
+
+      #wrong{
+        font-size:30px;
+        color:crimson;
+      }
+
+      #instructie{
+        font-size:20px;
+
+      }
+
+      #remember{
+        color:red
+      }
+    </style>
+
+  </head>
+  <body></body>
+  
+  <script src="informed_consent.js"></script>
+  
+  <script>
+///////////////////////////////////
+////////////// debug //////////////
+///////////////////////////////////
+keep_instruct = false;
+keep_phase1 = false;
+keep_phase2 = false;
+keep_phase3 = true;
+keep_phase4 = true;
+keep_phase5 = true;
+keep_interval = true;
+
+
+//////////////////////////////////////////////
+/////////////initialize jsPsych///////////////
+//////////////////////////////////////////////
+var completion_code = "location.href = 'https://app.prolific.com/submissions/complete?cc=C1L74FT7'"
+
+var jsPsych = initJsPsych({
+  show_progress_bar:true,
+  on_finish: function() {
+    //jsPsych.data.get().filter({useful_data: true}).ignore('stimulus').ignore('internal_node_id').ignore('key_press').ignore('time_elapsed').ignore('response').ignore('useful_data').localSave('csv','data.csv');
+    setTimeout(completion_code, 3000);}    
+});
+
+
+///////////////////////////////////
+///////////// functions ///////////
+///////////////////////////////////
+
+// SHUFFLE FUNCTION: shuffles array with seed
+function shuffle(array, seed) {
+  var m = array.length, t, i;
+  // While there remain elements to shuffle…
+  while (m) {
+    // Pick a remaining element…
+    i = Math.floor(random(seed) * m--);
+    // And swap it with the current element.
+    t = array[m];
+    array[m] = array[i];
+    array[i] = t;
+    ++seed
+  }
+  return array;
+}
+
+// random seed
+function random(seed) {
+  var x = Math.sin(seed++) * 10000;
+  return x - Math.floor(x);
+}
+
+
+// PAIR DUTCH WORDS WITH TRANSLATION
+function Wordpair_training(en, swa) {
+  this.en = en;
+  this.swa = swa;
+}
+
+// generate the wordpairs object
+function Wordpair(en, swa, swar1, swar2, swar3) {
+  this.en = en;
+  this.swa_juist = swa;
+  this.swa_rand1 = swar1;
+  this.swa_rand2 = swar2;
+  this.swa_rand3 = swar3
+}
+
+
+///////////////////////////////
+//////// General //////////////
+///////////////////////////////
+
+// arrays with English and Swahili words
+var woorden_training_en = ["bottle", "plane", "tea"];
+var woorden_training_swa = ["ufunguo", "chai", "daftari"];
+
+var extra_woorden_training_swa = ["kupika", "muguuzi", "dawati", "fizi", "umwagaji", "fimbo", "alama", "krismasi",
+                                  "jua", "dhoruba", "kuchoma", "mwimbaji"]
+
+//var woorden_en = ["tree" , "pen", "telephone", "notebook", "frame"];
+var woorden_en = ["bed", "berry", "mosquito","pudding", "sock", "fish", "sun", "cat",
+                  "boat", "bridge", "box", "donkey", "dog", "coffin", "knee", "lamp",
+                  "basket", "nose", "window", "spider", "tooth", "flag", "fork", "wolf",
+                  "column", "cop", "apple", "cup", "flower", "letter", "bread", "bucket",
+                  "hammer", "candle", "spoon", "olive", "shelf", "shoe", "snake", "stone",
+                  "marker", "wheel", "train", "gift", "hill", "ladder", "eel", "perfume",
+                  "scissors", "cigar", "tomato", "finger", "shop", "curtain", "body", "ceiling",
+                  "key", "tissue", "bonfire", "shoulder", "park", "cave", "salmon", "bank",
+                  "clock", "rose", "picture", "book", "door", "human", "giraffe", "pants",
+                  "woman", "sheet", "list", "mother", "music", "banana", "number", "page",
+                  "mirror", "notebook", "office", "elephant", "poster", "triangle", "towel",
+                  "magazine", "telephone", "squirrel", "puppet"];
+
+//var woorden_swa = ["adui" , "hasira" , "nyota" , "mchuzi" , "kusanya"];
+var woorden_swa = ['sabuni', 'sahani', 'samaki', 'sayari', 'sehemu', 'surali', 'tanuri', 'trekta', 'ufagio', 'ugomvi',
+                  'madungog', 'mahitabo', 'mapintas', 'martilyo', 'napakyas', 'paghalad', 'paghukom', 'pagpalit',
+                  'matumai', 'matumbo', 'mazishi', 'mchanga', 'mechezo', 'mgonjwa', 'msumari', 'mundamo',
+                  'kazi', 'kioo','kisu', 'kiti', 'kito', 'leso', 'maji', 'mali', 'maua', 'mbwa', 'mkuu', 'moyo', 'mvua',
+                  'pagsulod', 'pagtabon', 'pagtawag', 'pagtukod', 'pangalan', 'sensilyo', 'silingan', 'tindashan',
+                  'adui', 'afya', 'aibu', 'basi', 'bega', 'buli', 'dari', 'duka', 'elfu', 'geza', 'goti', 'haki', 'hofu',
+                  'jiwe', 'pamahaw', 'sulagma', 'tinapay', 'tuburan', 'bililhon', 'kabalaka', 'kasadpan', 'katuyoan',
+                  'uyoga', 'wimbo', 'wingi', 'wingu', 'adhabu', 'bafuni', 'bahari', 'baiski', 'bunifu', 'chombo',
+                  'kamwe', 'kemia', 'kesho', 'kiatu', 'kifua', 'kofia', 'kubwa', 'kumba', 'kweli', 'lugha', 'mamba',
+                  'agalon', 'babaye'];
+
+// Extra Swahili words (not the actual translations)
+var extra_swa = ['nchi', 'osha', 'seri', 'simu', 'soko', 'twai', 'watu', 'kama', 'tena', 'mara', 'kuna', 'kila',
+                'bado', 'akili', 'amani', 'asili', 'barua', 'bendi', 'bloke', 'chaki', 'chuki', 'chuma', 'chupa',
+                'chupi', 'daima', 'fedha', 'funzi', 'gundi', 'hamsi', 'hatua', 'ijayo', 'imani', 'jansa', 'juuya',
+                'kamba', 'mbuzi', 'mdudu', 'mekno', 'mfuko', 'miaka', 'mkasi', 'mkate', 'mkboa', 'mraba', 'msitu',
+                'mtawa', 'mungu', 'mvuke', 'mwezi', 'nanga', 'ndege', 'ndezu', 'ndizi', 'ndogo', 'ndugu', 'ngazi',
+                'ngono', 'nogozi', 'nopya', 'nyota', 'nzuri', 'ofisi', 'panya', 'petye', 'picha', 'pombe', 'punda',
+                'pwani', 'rangi', 'shule', 'siagi', 'tembo', 'tumbo', 'uadui', 'uhuru', 'ukame', 'uongo', 'usiku',
+                'choori', 'dakika', 'daraja', 'dizeli', 'farasi', 'furaha', 'gorisi', 'godoro', 'guruwe', 'hasira',
+                'hazini', 'ishara', 'ishiri', 'jeraha', 'jibini', 'jikoni', 'jokofu', 'jumatu', 'kaburi', 'kahawa',
+                'kalamu', 'katika', 'kelele', 'kichwa', 'kidole', 'kihozi', 'kijiko', 'kikapu', 'kimysa', 'kinywa',
+                'kisiwa', 'kitovu', 'kovuli', 'kuacha', 'kubale', 'kuhesa', 'kununa', 'kunywa', 'kuzama', 'mageho',
+                'maisha', 'mapafu', 'mashua', 'mbolea', 'mchawi', 'mchuzi', 'mlango', 'mpishi', 'mtirka', 'mwanga',
+                'mzungu', 'ndoora', 'nyange', 'nyeusi', 'nyundo', 'nyundu', 'rafiki', 'rombus', 'ukweli', 'wakala',
+                'washia', 'welder', 'yatima', 'haraka', 'alizeti', 'baadaye', 'baharia', 'bandari', 'bilaska',
+                'bustani', 'chubani','filimbi', 'kartasi', 'kawaida', 'kengele', 'kitanda', 'kitande', 'kudhibi',
+                'kujenga', 'kukimba', 'kumbuka', 'kupanda','kusanya', 'kushoto', 'mvringo', 'mwanake', 'ndaniya',
+                'neyemba', 'punguza', 'shimoni', 'singizi', 'starehe', 'sufuria', 'sungura', 'takatak', 'tamasha',
+                'abug', 'ahos', 'asin', 'atay', 'atop', 'awit', 'baba', 'baga', 'baho', 'baki', 'bala', 'baso',
+                'bata', 'bili', 'bino', 'daub', 'dila', 'duga', 'edad', 'gabi', 'goma', 'hari', 'init', 'isda',
+                'itik', 'kaso', 'kawa', 'kopa', 'kuta', 'lima', 'liog', 'liso', 'lobo', 'lubi', 'luha', 'pala',
+                'pito', 'suga', 'suka', 'tawo', 'abang', 'baboy', 'bakus', 'bugas', 'dagat', 'ganti', 'gubat',
+                'gutom', 'hulma', 'iring', 'karon', 'lamok', 'layag', 'lisud', 'pilak', 'rayna', 'silya', 'taras',
+                'tubag', 'umaga', 'kasuko', 'kerida', 'kugita', 'lalake', 'napulo', 'pintal', 'pundok', 'salita',
+                'tambok', 'tualya', 'abogado', 'bahandi', 'bentaha', 'bulwawan', 'bungtod', 'estante', 'kabuang',
+                'kalipay', 'kamantis', 'kanding', 'kasamok', 'lamigas', 'mahugaw', 'pagduol', 'paghago', 'pahiyum',
+                'bituin', 'bunyag', 'skina', 'hagdan', 'hangyo', 'ihalas', 'kadaot', 'kaili', 'ulimwengu',
+                'sweta', 'betri', 'utepe'];
+
+// shuffle arrays
+shuffle(woorden_en, 6);
+shuffle(woorden_swa, 8);
+shuffle(extra_swa, 88);
+
+// all the word pairs
+var wordpairs_training = [];
+var wordpairs = []; //array of 'wordpair' objects
+
+// loop to put words in objects
+// TO DO: change 5 to total number of English words
+for( i=0; i<3; i++){
+  wordpairs_training[i] = new Wordpair_training(woorden_training_en[i], woorden_training_swa[i]);
+}
+
+for( i=0; i<90; i++){
+  wordpairs[i] = new Wordpair(woorden_en[i], woorden_swa[i], extra_swa[3*i], extra_swa[3*i+1], extra_swa[3*i+2]);
+  //console.log('word_pair', i, wordpairs[i]);
+}
+
+// shuffle extra Swahili array
+shuffle(extra_swa, 2);
+
+
+
+
+
+// Create timeline
+var timeline = [];
+
+// preload the img
+var preload = {
+  type: jsPsychPreload,
+  images: ['img/example-confidence.png', 'img/example-correct.png', 'img/example-four-options.png', 'img/example-one-option.png', 'img/example-wrong.png',
+    'img/con1.png', 'img/con2.png', 'img/inc1.png', 'img/inc2.png'
+  ]
+}
+
+timeline.push(preload);
+
+// full screen
+var fullscreen = {
+  type: jsPsychFullscreen,
+  fullscreen_mode: true,
+  message: "<p>Click below to admit the experiment to go into fullscreen mode</p>",
+  button_label: "OK",
+  data: {useful_data: false}
+}
+        
+timeline.push(fullscreen);
+
+// informed consent
+timeline.push(informed_consent);
+
+
+
+// get the participant id from prolific
+var url_variable = jsPsych.data.urlVariables();
+var participant_number = url_variable.PROLIFIC_PID;
+
+// random seed
+rand_seed = Math.floor(Math.random()*88);
+
+// Define instructions trial
+var instructions_general1 = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: "<span  id= 'instructie' > <b>Welcome to this study</b> <br><br>"+
+            "This study is aimed at understanding how people learn.<br>"+
+            "For this, you will participate in an experiment where you will learn a new language. <br><br><br>"+
+            "The entire experiment consists of two sections: Learning Section and Testing Section. <br>"+
+            "In the Learning Section, you will first get familiar with all English-Swahili word pairs (Phase 1) and then complete two practical tests (Phases 2 and 3). <br>"+
+            "In the Testing Section, we will assess your learning performance through two final tests (Phases 4 and 5). <br><br><br>"+
+            "This experiment will take approximately 80 minutes, and the payment is £12.<br><br><br>"+
+            "Press any key to continue.</span>",
+  post_trial_gap: 100,
+  data: {useful_data: false},
+  on_finish: function () {
+    jsPsych.data.addProperties({random_seed: rand_seed})
+  }
+};
+
+if (keep_instruct) {
+  timeline.push(instructions_general1)
+} else {
+  ;
+}
+
+
+// Define instructions trial
+var instructions_general2 = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: "<span  id= 'instructie'><b>Learning Section</b><br><br>"+
+            "This is the first section of this experiment, which consists of 3 phases.<br><br>"+
+            "You will start with Phase 1: the acquisition phase.<br><br> "+
+            "Press any key to continue.</span>",
+  post_trial_gap: 100,
+  data: {useful_data: false}
+};
+
+if (keep_instruct) {
+  timeline.push(instructions_general2);
+} else {
+  ;
+}
+
+
+/////////////////////////////////////////
+/////////////////phase1//////////////////
+/////////////////////////////////////////
+shuffle(wordpairs, rand_seed+6);
+
+var instructions_phase1 = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus:
+  `<span  id= 'instructie'><b>Phase 1: the acquisition phase.</b><br><br>
+    On each trial, you will see an English word, paired with its foreign translation, which will be presented for 3 seconds <br>
+    You need to try to remember the foreign translation for each English word.<br><br>
+    Do not worry if you cannot remember all the words right away.</span>
+    <br><br><br>
+   <span id="instructie"><b>Here is an example of the word pair on each trial</b><span>
+    <br><br>
+   <span>${wordpairs_training[0].en} &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp ${wordpairs_training[0].swa}</span><br><br><br>
+   <span id='instructie'>Press any key to start the acquisition phase.</span>
+   `,
+  post_trial_gap: 100,
+  data: {useful_data: false}
+};
+
+if (keep_phase1) {
+  timeline.push(instructions_phase1);
+} else {
+  ;
+}
+
+
+// Loop that displays all the wordpairs for 3 sec
+for( i = 0; i<wordpairs.length; i++){
+  //Create stimulus
+  var word_stimuli = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<span>' + wordpairs[i].en + '&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp' + wordpairs[i].swa_juist + '</span>',
+      choices: "NO_KEYS",
+      trial_duration: 3000,
+      data: {useful_data: false}
+  }
+
+  // Push stimulus on the timeline
+  if (keep_phase1) {
+    timeline.push(word_stimuli);
+      } else {
+    ;
+  }
+}
+
+
+
+//////////////////////////////////////////////////////////
+////////////////////////////Phase 2///////////////////////
+//////////////////////////////////////////////////////////
+
+// shuffle the wordpairs
+shuffle(wordpairs, rand_seed+66);
+
+// Define instructions
+var instructions_transition1to2 = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: "<span id= 'instructie'>This is the end of Phase 1: the acquisition phase.<br><br>" +
+              "Press any key to continue.</span>",
+    post_trial_gap: 100,
+    data: {useful_data: false}
+};
+
+var instructions_phase2part1 = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: "<span id= 'instructie'>Now we will continue with Phase 2: the first practical test.<br><br>" +
+              "Press any key to continue.</span>",
+    post_trial_gap: 100,
+    data: {useful_data: false}
+};
+
+var instructions_phase2part2 = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus:
+    `<span id= 'instructie'><b>Phase 2: the first practical test.</b><br><br>
+      On each trial, You will see 1 English word, together with 4 possible translations.<br>
+      You need to indicate the correct translation by pressing "f", "v", "n" or "j" on the keyboard.</span><br><br><br>
+     <span id= 'instructie'><b>Here is an example</b></span><br><br>
+     <div>
+      <table style="margin: 0 auto;">
+          <tbody>
+            <tr>
+              <td></td>
+              <td><span> ${wordpairs_training[0].en} </span></td>
+              <td></td>
+            </tr>
+            <tr></tr>
+            <tr>
+              <td>
+                <p id="option"> f) ${wordpairs_training[0].swa} </p>
+                <p></p>
+                <p id="option"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; v) ${extra_woorden_training_swa[0]} </p>
+              </td>
+              <td></td>
+              <td/>
+                <p id="option"> j) ${extra_woorden_training_swa[1]} </p>
+                <p></p>
+                <p id="option"> n) ${extra_woorden_training_swa[2]} &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </p>
+              </td>
+            </tr>
+          </tbody>
+        </table><br><br>
+      </div>
+     <span id='instructie'>Press any key to continue</span>
+    `,
+    post_trial_gap: 100,
+    data: {useful_data: false}
+};
+
+var instructions_phase2part3 = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus:
+  `<span  id= 'instructie'><b>Phase 2: the first practical test.</b><br><br>
+    After you gave your answer, you will indicate how certain you were about your answer.<br>
+    This will happen on a scale from 1 (very uncertain) to 5 (very certain).<br>
+    For this, you will need to use your mouse instead of your keyboard.<br>
+    You must first click the confidence bar before you can proceed.<br> 
+    Because the bar starts in the neutral option, if you want to choose that neutral option, you must click on some other option, followed by the neutral one.</span><br><br> 
+   <span id='instructie'><b>Here is an example</b></span><br>
+   <img src='img/example-confidence.png'><br><br>
+   <span id='instructie'>Press any key to continue.</span>
+  `,
+  post_trial_gap: 100,
+  data: {useful_data: false}
+};
+
+if (keep_phase2) {
+  timeline.push(instructions_transition1to2, instructions_phase2part1, instructions_phase2part2, instructions_phase2part3) 
+} else {
+  ;
+}
+
+/*------------------------------------------TRAINING-----------------------------------*/
+var instructions_phase2part4 = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: "<span  id= 'instructie'><b>We will first start with a short training session.</b><br><br>" +
+             "Press any key to start.</span>",
+    post_trial_gap: 100,
+    data: {useful_data: false}
+};
+
+if (keep_phase2) {
+  timeline.push(instructions_phase2part4);
+} else {
+  ;
+}
+
+
+for( i = 0; i<2; i++){
+      var en_word = wordpairs_training[i].en;
+      var correct_swa_word = wordpairs_training[i].swa;
+      var swa_words = [extra_woorden_training_swa[4*i], extra_woorden_training_swa[4*i+1], extra_woorden_training_swa[4*i+2]];
+      var index_juiste_swa = Math.floor(Math.random()*4);
+      swa_words.splice(index_juiste_swa, 0, correct_swa_word);
+
+      // Get correct answer: f,v,j or n
+      var correct_answer = 'x';
+        switch(index_juiste_swa) {
+          case 0:
+              correct_answer = 'f';
+              break;
+          case 1:
+              correct_answer = 'v';
+              break;
+          case 2:
+              correct_answer = 'n';
+              break;
+          case 3:
+              correct_answer = 'j';
+              break;
+          default:
+              console.log('error');
+         }
+
+        var html_stimulus =
+          '<table>\
+            <tbody>\
+              <tr>\
+                <td></td>\
+                <td><span>' + en_word +' </span></td>\
+                <td></td>\
+              </tr>\
+              <tr></tr>\
+              <tr>\
+                <td>\
+                  <p id = "option" > f) ' + swa_words[0] + '</p>\
+                  <p></p>\
+                  <p id = "option" > &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; v) ' + swa_words[1] + '</p>\
+                </td>\
+                <td></td>\
+                <td/>\
+                  <p id = "option" > j) ' + swa_words[3] + '</p>\
+                  <p></p>\
+                  <p id = "option" > n) ' + swa_words[2] + '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</p>\
+                </td>\
+              </tr>\
+            </tbody>\
+          </table>';
+
+        //Display English word w/ 4 Swahili options
+        var multi_choice_block = {
+            type : jsPsychHtmlKeyboardResponse,
+            stimulus: html_stimulus,
+            choices : ['f' , 'v' , 'n', 'j'],
+            //trial_duration: 10,
+            data: {en_word: en_word, swa_word: correct_swa_word, correct_answer: correct_answer, useful_data: false, phase: 2},
+            on_finish: function(data){ // Check if answer is correct
+                var accuracy = false;
+                
+                if (data.correct_answer == data.response) {
+                  accuracy = true;
+                }
+                data.input_answer =  data.response; // Add given answer to the dataset
+                data.accuracy = accuracy;// Add accuracy to the dataset
+            }
+        }
+
+        //Display certainty rating scale
+        var cert_rating = {
+            type: jsPsychHtmlSliderResponse,
+            stimulus: ' &nbsp; &nbsp; &nbsp; &nbsp; How certain were you of your answer? &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </p>',
+            labels: ['very uncertain', 'uncertain', 'neutral', 'certain', 'very certain'],
+            //trial_duration: 10,
+            min: 1,
+            max: 5,
+            step: 1,
+            slider_start: 3,
+            require_movement: true,
+            data: {useful_data: false, phase:2},
+            }
+
+        // Push stimulus on the timeline
+        if (keep_phase2) {
+          timeline.push(multi_choice_block, cert_rating);
+        } else {
+          ;
+        }   
+    };
+
+/*------------------------------------------FOR REAL NOW-----------------------------------*/
+var instructions_phase2part5 = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus:
+    `
+    <span  id= 'instructie'> <b>Now, we will start with the actual test.</b><br><br>
+      Press any key to continue.
+      </span>
+    `,
+    post_trial_gap: 100,
+    data: {useful_data: false}
+  };
+
+if (keep_phase2) {
+  timeline.push(instructions_phase2part5);
+} else {
+  ;
+}
+
+// LOOP: display English word with 4 Swahili options. Choose 1 & afterwards indicate certainty
+for( i = 0; i<wordpairs.length; i++){
+        var en_word = wordpairs[i].en; // Get English word
+        var correct_swa_word = wordpairs[i].swa_juist; // Get correct Swahili translation
+        var swa_words = [wordpairs[i].swa_rand1,  wordpairs[i].swa_rand2, wordpairs[i].swa_rand3]; // Get multiple choice options
+        shuffle(swa_words, rand_seed+i);
+        var index_juiste_swa = Math.floor( Math.random()*4 ); // Generate index for correct Swahili word
+        swa_words.splice(index_juiste_swa, 0, correct_swa_word); // Add correct Swahili word to array
+
+        // Get correct answer: f,v,j or n
+        var correct_answer = 'x';
+        switch(index_juiste_swa) {
+            case 0:
+                correct_answer = 'f';
+                break;
+            case 1:
+                 correct_answer = 'v';
+                break;
+            case 2:
+                correct_answer = 'n';
+                break;
+            case 3:
+                correct_answer = 'j';
+                break;
+            default:
+                console.log('error');
+            }
+
+        var html_stimulus =
+          '<table>\
+            <tbody>\
+              <tr>\
+                <td></td>\
+                <td><span>' + en_word +' </span></td>\
+                <td></td>\
+              </tr>\
+              <tr></tr>\
+              <tr>\
+                <td>\
+                  <p id = "option" > f) ' + swa_words[0] + '</p>\
+                  <p></p>\
+                  <p id = "option" > &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; v) ' + swa_words[1] + '</p>\
+                </td>\
+                <td></td>\
+                <td/>\
+                  <p id = "option" > j) ' + swa_words[3] + '</p>\
+                  <p></p>\
+                  <p id = "option" > n) ' + swa_words[2] + '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</p>\
+                </td>\
+              </tr>\
+            </tbody>\
+          </table>';
+
+        //Display English word w/ 4 Swahili options
+        var multi_choice_block = {
+            type : jsPsychHtmlKeyboardResponse,
+            stimulus: html_stimulus,
+            choices : ['f' , 'v' , 'n', 'j'],
+            //trial_duration: 10,
+            data: {en_word: en_word, options: swa_words, swa_word: correct_swa_word, correct_answer: correct_answer, useful_data: true, phase: 2},
+            on_finish: function(data){ // Check if answer is correct
+                var accuracy = false;
+                if( data.correct_answer == data.response){
+                    accuracy = true;
+                }
+                data.input_answer =  data.response; // Add given answer to the dataset
+                // add input word to dataset
+                switch(data.input_answer){
+                  case 'f':
+                    data.input_word = data.options[0]
+                    console.log(data.input_word);
+                    break;
+                  case 'v':
+                    data.input_word = data.options[1];
+                    console.log(data.input_word);
+
+                    break;
+                  case 'n':
+                    data.input_word = data.options[2];
+                    console.log(data.input_word);
+
+                    break;
+                  case 'j':
+                    data.input_word = data.options[3];
+                    console.log(data.input_word);
+
+                    break;
+                  default:
+                    console.log('fault');
+                }
+                data.accuracy = accuracy;// Add accuracy to the dataset
+            }
+        }
+
+        //Display certainty rating scale
+        var cert_rating = {
+            type: jsPsychHtmlSliderResponse,
+            stimulus: ' &nbsp; &nbsp; &nbsp; &nbsp; How certain were you of your answer? &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </p>',
+            labels: ['very uncertain', 'uncertain', 'neutral', 'certain', 'very certain'],
+            min: 1,
+            max: 5,
+            step: 1,
+            slider_start: 3,
+            require_movement: true,
+            //trial_duration: 10,
+            data: {useful_data: true, phase:2},
+            on_finish: function(data){
+              jsPsych.data.get().addToLast({certainty: data.response});
+            }
+        };
+
+        // Push stimulus on the timeline
+        if (keep_phase2) {
+          timeline.push(multi_choice_block, cert_rating);
+        } else {
+          ;
+        }
+    }
+
+
+////////////////////////////////////////////////////////////
+//////////////////////////Phase 3///////////////////////////
+////////////////////////////////////////////////////////////
+
+var instructions_transition2to3 = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: "<span  id= 'instructie'><b>This is the end of Phase 2: the first practical test</b><br><br>" +
+              "Press any key to continue.</span>",
+    post_trial_gap: 100,
+    data: {useful_data: false}
+};
+
+// Define instructions trial
+var instructions_phase3part1 = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: "<span  id= 'instructie'><b>Phase 3: the second practical test</b><br><br>" + 
+              "Now we will continue with the second practical test.<br><br>" +
+              "Press any key to continue.</span>",
+    post_trial_gap: 100,
+    data: {useful_data: false}
+};
+
+var instructions_phase3part2 = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus:
+    `<span id= 'instructie'><b>Phase 3: the second practical test</b><br><br>
+      On each trial, you will see 1 English word, together with 4 possible translations.<br>
+      The key difference from the first testing phase is that only the eligible translations will be framed, and you can only choose from these framed options. <br><br>
+      Press any key to continue.</span>
+    `,
+    post_trial_gap: 100,
+    data: {useful_data: false}
+};
+
+var instructions_phase3part3_1 = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus:
+    `<span id= 'instructie'><b>Phase 3: the second practical test</b><br><br>
+      For example, if all 4 translations are framed, this means you need to choose the correct translation from those 4 options.
+      As shown in the picture below.
+     </span><br><br>
+     <img src='img/example-four-options.png'><br><br>
+     <span id='instructie'>Press any key to continue</span>`,
+    post_trial_gap: 100,
+    data: {useful_data: false}
+};
+
+var instructions_phase3part3_2 = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus:
+  `<span id= 'instructie'><b>Phase 3: the second practical test</b><br><br>
+    If only 1 translation is framed, this means it is the correct translation, and you can only choose this translation.
+    As shown in the picture below.
+    </span><br><br>
+    <img src='img/example-one-option.png'><br><br>
+  <span id='instructie'>Press any key to continue</span>`,
+  post_trial_gap: 100,
+  data: {useful_data: false}
+};
+
+var instructions_phase3part4 = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus:
+  `<span id= 'instructie'><b>Phase 3: the second practical test</b><br><br>
+    You need to indicate the correct translation by pressing "f", "v", "n" or "j" on the keyboard.<br><br>
+    Press any key to continue.</span>
+  `,
+  post_trial_gap: 100,
+  data: {useful_data: false}
+};
+
+var instructions_phase3part5 = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus:
+  `<span  id= 'instructie'><b>Phase 3: the second practical test</b><br><br>
+    After you gave your answer, you will indicate how certain you were about your answer.<br>
+    This will happen on a scale from 1 (very uncertain) to 5 (very certain).<br>
+    For this, you will need to use your mouse instead of your keyboard.<br>
+    You must first click the confidence bar before you can proceed.<br> 
+    Because the bar starts in the neutral option, if you want to choose that neutral option, you must click on some other option, followed by the neutral one.</span><br><br> 
+   <span id='instructie'><b>Here is an example</b></span><br>
+   <img src='img/example-confidence.png'><br><br>
+  <span id='instructie'>Press any key to continue.</span>
+  `,
+  post_trial_gap: 100,
+  data: {useful_data: false}
+};
+
+
+if (keep_phase3) {
+  timeline.push(instructions_transition2to3, instructions_phase3part1, instructions_phase3part2, instructions_phase3part3_1,
+  instructions_phase3part3_2, instructions_phase3part4, instructions_phase3part5
+  );
+} else {
+  ;
+}
+
+
+  // set testing and studying conditions
+  // for training
+  var active_options_training = [true, false]
+  // for testing
+  var active_options = new Array(wordpairs.length);
+          for(var i = 0; i<active_options.length ;i++){
+            if(i < active_options.length * 0.2){
+              active_options[i] = false;
+            }
+            else{
+              active_options[i] = true;
+            }
+          }
+  shuffle(active_options, 0);
+
+// LOOP: display English word with 4 Swahili options. Choose 1 & afterwards indicate certainty
+shuffle(wordpairs, rand_seed+666)
+
+
+/////////////////////// training///////////////////
+// instruction
+var instructions_phase3part6 = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus:
+  `
+  <span id='instructie'>
+    <b>We will first start with a short training session.</b><br><br>
+    Press any key to continue
+  </span>
+  `,
+  post_trial_gap: 100,
+  data: {useful_data: false}
+};
+
+if (keep_phase3) {
+  timeline.push(instructions_phase3part6)
+} else {
+  ;
+}
+
+// training trials
+for (i=0; i<2; i++) {
+  var en_word = wordpairs_training[i].en;
+  var correct_swa_word = wordpairs_training[i].swa;
+  var swa_words = [extra_woorden_training_swa[4*i+0], extra_woorden_training_swa[4*i+1], extra_woorden_training_swa[4*i+2]];
+  var index_juiste_swa = Math.floor(Math.random()*4);
+  swa_words.splice(index_juiste_swa, 0, correct_swa_word)
+
+
+  // Get correct answer: f,v,j or n
+  var correct_answer = 'x';
+        switch(index_juiste_swa){
+            case 0:
+                correct_answer = 'f';
+                break;
+            case 1:
+                 correct_answer = 'v';
+                break;
+            case 2:
+                correct_answer = 'n';
+                break;
+            case 3:
+                correct_answer = 'j';
+                break;
+            default:
+                console.log('fault');
+            }
+
+
+
+        // Function to generate stimulus and choices
+        function get_stimulus(){
+          var all_options_active = true;
+          var random = Math.floor(Math.random()*100);
+
+          // 20% of the time only one option will be active
+          if(active_options_training[i]  == false){
+            all_options_active = false;
+          }
+
+          if(all_options_active == true){
+            var choices = ['f' , 'v' , 'n', 'j'];
+            //stimulus formated in html
+            var html_stimulus =
+            '<table>\
+              <tbody>\
+                <tr>\
+                  <td></td>\
+                  <td><span>' + en_word +' </span></td>\
+                  <td></td>\
+                </tr>\
+                <tr></tr>\
+                <tr>\
+                  <td>\
+                    <p id = "active_option" > f) ' + swa_words[0] + '</p>\
+                    <p></p>\
+                    <p id = "active_option" > &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; v) ' + swa_words[1] + '</p>\
+                  </td>\
+                  <td></td>\
+                  <td/>\
+                    <p id = "active_option" > j) ' + swa_words[3] + '</p>\
+                    <p></p>\
+                    <p id = "active_option" > n) ' + swa_words[2] + '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</p>\
+                  </td>\
+                </tr>\
+              </tbody>\
+            </table>';
+
+
+            return {
+              html_stimulus,
+              choices
+            };
+          }
+          else{
+            var option1 = 'unactive_option';
+            var option2 = 'unactive_option';
+            var option3 = 'unactive_option';
+            var option4 = 'unactive_option';
+            var choices;
+            // change css id for correct answer
+            switch(index_juiste_swa) {
+              case 0:
+                  option1 = 'active_option';
+                  choices = ['f'];
+                  break;
+              case 1:
+                  option2 = 'active_option';
+                  choices = ['v'];
+                  break;
+              case 2:
+                  option3 = 'active_option';
+                  choices = ['n'];
+                  break;
+              case 3:
+                  option4 = 'active_option';
+                  choices = ['j'];
+                  break;
+              default:
+                  console.log('fault');
+              }
+
+            //stimulus formated in html
+            var html_stimulus =
+            '<table>\
+              <tbody>\
+                <tr>\
+                  <td></td>\
+                  <td><span>' + en_word +' </span></td>\
+                  <td></td>\
+                </tr>\
+                <tr></tr>\
+                <tr>\
+                  <td>\
+                    <p id = '+option1+' > f) ' + swa_words[0] + '</p>\
+                    <p></p>\
+                    <p id = '+option2+' > &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; v) ' + swa_words[1] + '</p>\
+                  </td>\
+                  <td></td>\
+                  <td/>\
+                    <p id = '+option4+' > j) ' + swa_words[3] + '</p>\
+                    <p></p>\
+                    <p id = '+option3+' > n) ' + swa_words[2] + '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</p>\
+                  </td>\
+                </tr>\
+              </tbody>\
+            </table>';
+            return {
+              html_stimulus,
+              choices
+            };
+          }
+        }
+
+
+        // get stimulus and choices
+        var stimulus_object = get_stimulus(); // run function to get stimulus and choices
+        var stimulus = stimulus_object.html_stimulus; // get stimulus
+        var choices = stimulus_object.choices; // get choices
+        
+
+        //Display English word w/ 4 Swahili options
+        var multi_choice_block_phase3_training = {
+            type : jsPsychHtmlKeyboardResponse,
+            stimulus: stimulus,
+            choices : choices,
+            //trial_duration: 10,
+            data: {en_word: en_word, options: swa_words, swa_word: correct_swa_word, correct_answer: correct_answer, useful_data: false, phase:3, amt_choices: choices.length},
+            on_finish: function(data){ // Check if answer is correct
+                var accuracy = false;
+                if( data.correct_answer == data.response){
+                    accuracy = true;
+                }
+                data.input_answer =  data.response; // Add given answer to the dataset
+                // add input word to dataset
+                switch(data.input_answer){
+                  case 'f':
+                    data.input_word = data.options[0]
+                    console.log(data.input_word);
+
+                    break;
+                  case 'v':
+                    data.input_word = data.options[1];
+                    console.log(data.input_word);
+
+                    break;
+                  case 'n':
+                    data.input_word = data.options[2];
+                    console.log(data.input_word);
+
+                    break;
+                  case 'j':
+                    data.input_word = data.options[3];
+                    console.log(data.input_word);
+
+                    break;
+                  default:
+                    console.log('fault');
+                }
+                data.accuracy = accuracy;// Add accuracy to the dataset
+            }
+        }
+
+        //Display certainty rating scale
+        var rating1_phase3_training = {
+            type: jsPsychHtmlSliderResponse,
+            stimulus: ' &nbsp; &nbsp; &nbsp; &nbsp; How certain were you of your answer? &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </p>',
+            labels: ['very uncertain', 'uncertain', 'neutral', 'certain', 'very certain'],
+            min: 1,
+            max: 5,
+            step: 1,
+            slider_start: 3,
+            require_movement: true,
+            //trial_duration: 10,
+            data: {useful_data: false, phase: 3},
+            on_finish: function(data){
+              jsPsych.data.get().addToLast({certainty: data.response});
+            }
+        };
+
+        // fixation
+        var fixation3_training = {
+          type: jsPsychHtmlKeyboardResponse,
+          stimulus: `<span id='fix'> + </span>`,
+          choices: "NO_KEYS",
+          trial_duration: 2000,
+          data: {useful_data: false}
+        }
+
+        // Push stimulus on the timeline
+        if (keep_phase3) {
+          timeline.push(multi_choice_block_phase3_training, rating1_phase3_training, fixation3_training);
+        } else {
+          ;
+        }
+}
+
+
+
+
+/////////////// real test ///////////////
+// instruction
+var instructions_phase3part7 = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus:
+  `
+  <span id='instructie'>
+    <b>Now, we will start with the actual test.</b><br><br>
+    Press any key to continue.
+    </span>
+  `,
+  post_trial_gap: 100,
+  data: {useful_data: false}
+};
+
+if (keep_phase3) {
+  timeline.push(instructions_phase3part7)
+} else {
+  ;
+}
+
+
+// testing trials
+for( i = 0; i<wordpairs.length; i++){
+        var en_word = wordpairs[i].en; // Get English word
+        var correct_swa_word = wordpairs[i].swa_juist; // Get correct Swahili translation
+        var swa_words = [wordpairs[i].swa_rand1,  wordpairs[i].swa_rand2, wordpairs[i].swa_rand3]; // Get multiple choice options
+        shuffle(swa_words, rand_seed+i+90);
+        var index_juiste_swa = Math.floor( Math.random()*4 ); // Generate index for correct Swahili word
+        swa_words.splice(index_juiste_swa, 0, correct_swa_word); // Add correct Swahili word to array
+
+        // Get correct answer: f,v,j or n
+        var correct_answer = 'x';
+        switch(index_juiste_swa){
+            case 0:
+                correct_answer = 'f';
+                break;
+            case 1:
+                 correct_answer = 'v';
+                break;
+            case 2:
+                correct_answer = 'n';
+                break;
+            case 3:
+                correct_answer = 'j';
+                break;
+            default:
+                console.log('fault');
+            }
+
+        
+        // Function to generate stimulus and choices
+        function get_stimulus(){ 
+          var all_options_active = true;
+          var random = Math.floor(Math.random()*100);
+
+          // 20% of the time only one option will be active
+          if(active_options[i]  == false){
+            all_options_active = false;
+          }  
+
+          if(all_options_active == true){
+            var choices = ['f' , 'v' , 'n', 'j'];
+            //stimulus formated in html
+            var html_stimulus = 
+            '<table>\
+              <tbody>\
+                <tr>\
+                  <td></td>\
+                  <td><span>' + en_word +' </span></td>\
+                  <td></td>\
+                </tr>\
+                <tr></tr>\
+                <tr>\
+                  <td>\
+                    <p id = "active_option" > f) ' + swa_words[0] + '</p>\
+                    <p></p>\
+                    <p id = "active_option" > &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; v) ' + swa_words[1] + '</p>\
+                  </td>\
+                  <td></td>\
+                  <td/>\
+                    <p id = "active_option" > j) ' + swa_words[3] + '</p>\
+                    <p></p>\
+                    <p id = "active_option" > n) ' + swa_words[2] + '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</p>\
+                  </td>\
+                </tr>\
+              </tbody>\
+            </table>';
+            
+            return {
+              html_stimulus,
+              choices
+            };
+          }
+          else{
+            var option1 = 'unactive_option';
+            var option2 = 'unactive_option';
+            var option3 = 'unactive_option';
+            var option4 = 'unactive_option';
+            var choices;
+            // change css id for correct answer 
+            switch(index_juiste_swa) {
+              case 0:
+                  option1 = 'active_option';
+                  choices = ['f'];
+                  break;
+              case 1:
+                  option2 = 'active_option';
+                  choices = ['v'];
+                  break;
+              case 2:
+                  option3 = 'active_option';
+                  choices = ['n'];
+                  break;
+              case 3: 
+                  option4 = 'active_option';
+                  choices = ['j'];
+                  break;
+              default:
+                  console.log('fault');
+              }
+
+            //stimulus formated in html
+            var html_stimulus = 
+            '<table>\
+              <tbody>\
+                <tr>\
+                  <td></td>\
+                  <td><span>' + en_word +' </span></td>\
+                  <td></td>\
+                </tr>\
+                <tr></tr>\
+                <tr>\
+                  <td>\
+                    <p id = '+option1+' > f) ' + swa_words[0] + '</p>\
+                    <p></p>\
+                    <p id = '+option2+' > &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; v) ' + swa_words[1] + '</p>\
+                  </td>\
+                  <td></td>\
+                  <td/>\
+                    <p id = '+option4+' > j) ' + swa_words[3] + '</p>\
+                    <p></p>\
+                    <p id = '+option3+' > n) ' + swa_words[2] + '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</p>\
+                  </td>\
+                </tr>\
+              </tbody>\
+            </table>';
+
+            return {
+              html_stimulus,
+              choices
+            };
+          }
+        }
+
+        // get stimulus and choices
+        var stimulus_object = get_stimulus(); // run function to get stimulus and choices
+        var stimulus = stimulus_object.html_stimulus; // get stimulus
+        var choices = stimulus_object.choices; // get choices
+        
+        //Display English word w/ 4 Swahili options
+        var multi_choice_block_phase3 = {
+            type : jsPsychHtmlKeyboardResponse,
+            stimulus: stimulus,
+            choices : choices,
+            //trial_duration: 10,
+            data: {en_word: en_word, options: swa_words, swa_word: correct_swa_word, correct_answer: correct_answer, useful_data: true, phase:3, stage: "choice", amt_choices: choices.length},
+            on_finish: function(data){ // Check if answer is correct
+                var accuracy = false;
+                if( data.correct_answer == data.response){
+                    accuracy = true;
+                }
+                data.input_answer =  data.response; // Add given answer to the dataset
+                // add input word to dataset
+                switch(data.input_answer){
+                  case 'f':
+                    data.input_word = data.options[0]
+                    console.log(data.input_word);
+                    break;
+                  case 'v':
+                    data.input_word = data.options[1];
+                    console.log(data.input_word);
+
+                    break;
+                  case 'n':
+                    data.input_word = data.options[2];
+                    console.log(data.input_word);
+
+                    break;
+                  case 'j':
+                    data.input_word = data.options[3];
+                    console.log(data.input_word);
+
+                    break;
+                  default:
+                    console.log('fault');
+                }
+                data.accuracy = accuracy;// Add accuracy to the dataset
+            }
+        }
+
+        //Display certainty rating scale
+        var rating1_phase3 = {
+            type: jsPsychHtmlSliderResponse,
+            stimulus: ' &nbsp; &nbsp; &nbsp; &nbsp; How certain were you of your answer? &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </p>',
+            labels: ['very uncertain', 'uncertain', 'neutral', 'certain', 'very certain'],
+            min: 1,
+            max: 5,
+            step: 1,
+            slider_start: 3,
+            require_movement: true,
+            //trial_duration: 10,
+            data: {useful_data: true, phase: 3, stage: "rating1"},
+            on_finish: function(data){
+              jsPsych.data.get().addToLast({certainty: data.response});
+            }
+        };
+
+        // fixation
+        var fixation3 = {
+          type: jsPsychHtmlKeyboardResponse,
+          stimulus: `<span id='fix'> + </span>`,
+          choices: "NO_KEYS",
+          trial_duration: 2000,
+          data: {useful_data: false}
+        }
+
+        // Push stimulus on the timeline
+        if (keep_phase3) {
+          timeline.push(multi_choice_block_phase3, rating1_phase3, fixation3);
+        } else {
+          ;
+        }        
+    }
+
+
+
+///////////////////////////////////////////////////////////
+///////////// break and flanker task //////////////////////
+///////////////////////////////////////////////////////////
+
+/* experiment parameters*/
+var reps_per_trial_type = 80;
+
+/*set up welcome block*/
+var welcome = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: "You have finished the Learning Section. Before starting the Testing Section, you need to complete a different task as an interval.<br><br>"+ 
+    "Press any key to continue.",
+  data: {useful_data: false}
+};
+
+/*set up instructions block*/
+var instructions = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: "<p>In this task, you will see five arrows on the screen, like the example below.</p>"+
+    "<img src='img/inc1.png'></img>"+
+    "<p>Press the left arrow key if the middle arrow is pointing left. (<)</p>"+
+    "<p>Press the right arrow key if the middle arrow is pointing right. (>)</p>"+
+    "<p>Press any key to begin.</p>",
+  post_trial_gap: 1000,
+  data: {useful_data: false}
+};
+
+/*defining stimuli*/
+var test_stimuli = [
+  {
+    stimulus: "img/con1.png",
+    data: { stim_type: 'congruent', direction: 'left'}
+  },
+  {
+    stimulus: "img/con2.png",
+    data: { stim_type: 'congruent', direction: 'right'}
+  },
+  {
+    stimulus: "img/inc1.png",
+    data: { stim_type: 'incongruent', direction: 'right'}
+  },
+  {
+    stimulus: "img/inc2.png",
+    data: { stim_type: 'incongruent', direction: 'left'}
+  }
+];
+
+/* defining test timeline */
+var test = {
+  timeline: [{
+    type: jsPsychImageKeyboardResponse,
+    choices: ['ArrowLeft', 'ArrowRight'],
+    trial_duration: 1500,
+    response_ends_trial: true,
+    stimulus: jsPsych.timelineVariable('stimulus'),
+    data: jsPsych.timelineVariable('data'),
+    on_finish: function(data){
+      var correct = false;
+      if(data.direction == 'left' && data.response == 'arrowleft' && data.rt > -1){
+        correct = true;
+      } else if(data.direction == 'right' && data.response == 'arrowright' && data.rt > -1){
+        correct = true;
+      }
+      data.correct = correct;
+      console.log(data.direction, data.response, data.correct)
+    },
+    post_trial_gap: function() {
+        return Math.floor(Math.random() * 1500) + 500;
+    }
+  }],
+  timeline_variables: test_stimuli,
+  sample: {type: 'fixed-repetitions', size: reps_per_trial_type}
+};
+
+/*End of the interval task*/
+var instruct_end = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: "You have finished the interval task.<br><br>"+ 
+    "Press any key to continue",
+  data: {useful_data: false}
+}
+
+/*set up experiment structure*/
+if (keep_interval) {
+  timeline.push(welcome, instructions, test, instruct_end);
+} else {
+  ;
+}
+
+
+//////////////////////////////////////////////////////////////
+///////////////////// Section 2: general /////////////////////
+//////////////////////////////////////////////////////////////
+
+// instruction welcome
+var instruction_welcome = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus:
+  `
+  <p><b>Welcome to the second section of our experiment.</b></p>
+  <p>In the first section of our experiment, you have learned some words of a new language.</p>
+  <p>Your learning performance will be checked in the Testing Section.</p><br>
+  <p>Press any key to continue.</p>
+  `,
+  post_trial_gap: 100,
+  data: {useful_data: false}
+};
+
+if (keep_instruct) {
+  timeline.push(instruction_welcome);
+} else {
+  ;
+}
+
+
+// Define instructions trial
+var instructions_general = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: "<span  id= 'instructie'>The Testing Section consists of 2 phases: Phase 4 and Phase 5<br>"+
+            "You will begin with Phase 4: the first final test.<br><br> "+
+            "Press any key to continue.</span>",
+  post_trial_gap: 100,
+  data: {useful_data: false}
+};
+
+if (keep_instruct) {
+  timeline.push(instructions_general);
+} else {
+  ;
+}
+
+
+
+/////////////////////////////////////////////
+/////////////// Phase 4 /////////////////////
+/////////////////////////////////////////////
+
+// shuffle the wordpairs
+shuffle(wordpairs, rand_seed+6666);
+
+var instructions_phase4part1 = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: "<span  id= 'instructie'><b>Phase 4: the first final test </b><br><br>"+
+              "Now we will start with the first final test.<br><br>" +
+              "Press any key to continue.</span>",
+    post_trial_gap: 100,
+    data: {useful_data: false}
+  };
+
+if (keep_phase4) {
+  timeline.push(instructions_phase4part1);
+} else {
+  ;
+}
+  
+
+var instructions_phase4part2 = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: 
+    `<span id= 'instructie'><b>Phase 4: the first final test</b><br><br> 
+      On each trial, You will see 1 English word, together with 4 possible translations.<br>
+      You need to indicate the correct translation by pressing "f", "v", "n" or "j" on the keyboard.</span><br><br><br>
+     <span id= 'instructie'><b>Here is an example</b></span><br><br>
+     <div>
+      <table style="margin: 0 auto;">
+          <tbody>
+            <tr>
+              <td></td>
+              <td><span> ${wordpairs_training[0].en} </span></td>
+              <td></td>
+            </tr>
+            <tr></tr>
+            <tr>
+              <td>
+                <p id="option"> f) ${wordpairs_training[0].swa} </p>
+                <p></p>
+                <p id="option"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; v) ${extra_woorden_training_swa[0]} </p>
+              </td>
+              <td></td>
+              <td/>
+                <p id="option"> j) ${extra_woorden_training_swa[1]} </p>
+                <p></p>
+                <p id="option"> n) ${extra_woorden_training_swa[2]} &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </p>
+              </td>
+            </tr>
+          </tbody>
+        </table><br><br>
+      </div><br><br>
+     <span id='instructie'>Press any key to continue</span>
+    `,
+    post_trial_gap: 100,
+    data: {useful_data: false}
+  };
+
+if (keep_phase4) {
+  timeline.push(instructions_phase4part2);
+} else {
+  ;
+}
+ 
+
+var instructions_phase4part3 = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: 
+    `<span  id= 'instructie'><b>Phase 4: the first final test</b><br><br>
+    After you gave your answer, you will indicate how certain you were about your answer.<br>
+    This will happen on a scale from 1 (very uncertain) to 5 (very certain).<br>
+    For this, you will need to use your mouse instead of your keyboard.<br>
+    You must first click the confidence bar before you can proceed.<br> 
+    Because the bar starts in the neutral option, if you want to choose that neutral option, you must click on some other option, followed by the neutral one.</span><br><br> 
+   <span id='instructie'><b>Here is an example</b></span><br>
+   <img src='img/example-confidence.png'><br><br>
+   <span id='instructie'>Press any key to continue.</span>
+   `,
+    post_trial_gap: 100,
+    data: {useful_data: false}
+    };
+
+if (keep_phase4) {
+  timeline.push(instructions_phase4part3);
+} else {
+  ;
+}
+
+
+// LOOP: display English word with 4 Swahili options. Choose 1 & afterwards indicate certainty
+for( i = 0; i<wordpairs.length; i++){
+        var en_word = wordpairs[i].en; // Get English word
+        var correct_swa_word = wordpairs[i].swa_juist; // Get correct Swahili translation
+        var swa_words = [wordpairs[i].swa_rand1,  wordpairs[i].swa_rand2, wordpairs[i].swa_rand3]; // Get multiple choice options
+        shuffle(swa_words, rand_seed+i+180);
+        var index_juiste_swa = Math.floor( Math.random()*4 ); // Generate index for correct Swahili word
+        swa_words.splice(index_juiste_swa, 0, correct_swa_word); // Add correct Swahili word to array
+
+        // Get correct answer: f,v,j or n
+        var correct_answer = 'x';
+        switch(index_juiste_swa) {
+            case 0:
+                correct_answer = 'f';
+                break;
+            case 1:
+                 correct_answer = 'v';
+                break;
+            case 2:
+                correct_answer = 'n';
+                break;
+            case 3:
+                correct_answer = 'j';
+                break;
+            default:
+                console.log('error');
+            }
+
+        //stimulus formated in html
+        var html_stimulus =
+          '<table>\
+            <tbody>\
+              <tr>\
+                <td></td>\
+                <td><span>' + en_word +' </span></td>\
+                <td></td>\
+              </tr>\
+              <tr></tr>\
+              <tr>\
+                <td>\
+                  <p id = "option" > f) ' + swa_words[0] + '</p>\
+                  <p></p>\
+                  <p id = "option" > &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; v) ' + swa_words[1] + '</p>\
+                </td>\
+                <td></td>\
+                <td/>\
+                  <p id = "option" > j) ' + swa_words[3] + '</p>\
+                  <p></p>\
+                  <p id = "option" > n) ' + swa_words[2] + '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</p>\
+                </td>\
+              </tr>\
+            </tbody>\
+          </table>';
+
+        //Display English word w/ 4 Swahili options
+        var multi_choice_block_phase4 = {
+            type : jsPsychHtmlKeyboardResponse,
+            stimulus: html_stimulus,
+            choices : ['f' , 'v' , 'n', 'j'],
+            //trial_duration: 10,
+            data: {en_word: en_word, options: swa_words, swa_word: correct_swa_word, correct_answer: correct_answer,useful_data: true, phase: 4},
+            on_finish: function(data){ // Check if answer is correct
+                var accuracy = false;
+                if( data.correct_answer == data.response){
+                    accuracy = true;
+                }
+                data.input_answer =  data.response; // Add given answer to the dataset
+                // add input word to dataset
+                switch(data.input_answer){
+                  case 'f':
+                    data.input_word = data.options[0]
+                    console.log(data.input_word);
+                    break;
+                  case 'v':
+                    data.input_word = data.options[1];
+                    console.log(data.input_word);
+
+                    break;
+                  case 'n':
+                    data.input_word = data.options[2];
+                    console.log(data.input_word);
+
+                    break;
+                  case 'j':
+                    data.input_word = data.options[3];
+                    console.log(data.input_word);
+
+                    break;
+                  default:
+                    console.log('fault');
+                }
+                data.accuracy = accuracy;// Add accuracy to the dataset
+            }
+        }
+
+        //Display certainty rating scale
+        var cert_rating_phase4 = {
+            type: jsPsychHtmlSliderResponse,
+            stimulus: ' &nbsp; &nbsp; &nbsp; &nbsp; How certain were you of your answer? &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </p>',
+            labels: ['very uncertain', 'uncertain', 'neutral', 'certain', 'very certain'],
+            min: 1,
+            max: 5,
+            step: 1,
+            slider_start: 3,
+            require_movement: true,
+            //trial_duration: 10,
+            data: {useful_data: true, phase:4},
+            on_finish: function(data){
+              jsPsych.data.get().addToLast({certainty: data.response});
+            }
+        };
+
+        // Push stimulus on the timeline
+        if (keep_phase4) {
+          timeline.push(multi_choice_block_phase4, cert_rating_phase4);
+        } else {
+          ;
+        }
+    }
+
+//////////////////////////////////////////////////////////
+///////////////// Section 2: Phase 5 /////////////////////
+//////////////////////////////////////////////////////////
+
+// shuffle the wordpairs
+shuffle(wordpairs, rand_seed+66666);
+
+var instructions_phase4to5 = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: "<span  id= 'instructie'>This is the end of Phase 4: the first final test.<br><br>"+
+              "The next phase is the second final test<br><br>"+
+              "Press any key to take the second final test.</span>",
+    post_trial_gap: 100,
+    data: {useful_data: false}
+  };
+
+if (keep_phase5) {
+  timeline.push(instructions_phase4to5);
+} else {
+  ;
+}
+
+
+var instructions_phase5part1 = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus:
+  `<span id= 'instructie'><b>Phase 5: the second final test</b><br><br> 
+      On each trial, You will see 1 English word, together with 4 possible translations.<br>
+      You need to indicate the correct translation by pressing "f", "v", "n" or "j" on the keyboard.</span><br><br><br>
+     <span id= 'instructie'><b>Here is an example</b></span><br><br>
+     <div>
+      <table style="margin: 0 auto;">
+          <tbody>
+            <tr>
+              <td></td>
+              <td><span> ${wordpairs_training[0].en} </span></td>
+              <td></td>
+            </tr>
+            <tr></tr>
+            <tr>
+              <td>
+                <p id="option"> f) ${wordpairs_training[0].swa} </p>
+                <p></p>
+                <p id="option"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; v) ${extra_woorden_training_swa[0]} </p>
+              </td>
+              <td></td>
+              <td/>
+                <p id="option"> j) ${extra_woorden_training_swa[1]} </p>
+                <p></p>
+                <p id="option"> n) ${extra_woorden_training_swa[2]} &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </p>
+              </td>
+            </tr>
+          </tbody>
+        </table><br><br>
+      </div><br><br>
+     <span id='instructie'>Press any key to continue</span>
+    `,
+  post_trial_gap: 100,
+  data: {useful_data: false}
+};
+
+if (keep_phase5) {
+  timeline.push(instructions_phase5part1);
+} else {
+  ;
+}
+
+
+var instructions_phase5part2 = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: 
+    `<span  id= 'instructie'><b>Phase 5: the second final test</b><br><br>
+    After you gave your answer, you will indicate how certain you were about your answer.<br>
+    This will happen on a scale from 1 (very uncertain) to 5 (very certain).<br>
+    For this, you will need to use your mouse instead of your keyboard.<br>
+    You must first click the confidence bar before you can proceed.<br> 
+    Because the bar starts in the neutral option, if you want to choose that neutral option, you must click on some other option, followed by the neutral one.</span><br><br> 
+   <span id='instructie'><b>Here is an example</b></span><br>
+   <img src='img/example-confidence.png'><br><br>
+   <span id='instructie'>Press any key to continue.</span>
+   `,
+    post_trial_gap: 100,
+    data: {useful_data: false}
+};
+
+if (keep_phase5) {
+  timeline.push(instructions_phase5part2);
+} else {
+  ;
+}
+
+
+// LOOP: display English word with 4 Swahili options. Choose 1 & afterwards indicate certainty
+for( i = 0; i<wordpairs.length; i++){
+        var en_word = wordpairs[i].en; // Get English word
+        var correct_swa_word = wordpairs[i].swa_juist; // Get correct Swahili translation
+        var swa_words = [wordpairs[i].swa_rand1,  wordpairs[i].swa_rand2, wordpairs[i].swa_rand3]; // Get multiple choice options
+        shuffle(swa_words, rand_seed+i+270);
+        var index_juiste_swa = Math.floor( Math.random()*4 ); // Generate index for correct Swahili word
+        swa_words.splice(index_juiste_swa, 0, correct_swa_word); // Add correct Swahili word to array
+
+        // Get correct answer: f,v,j or n
+        var correct_answer = 'x';
+        switch(index_juiste_swa) {
+            case 0:
+                correct_answer = 'f';
+                break;
+            case 1:
+                 correct_answer = 'v';
+                break;
+            case 2:
+                correct_answer = 'n';
+                break;
+            case 3:
+                correct_answer = 'j';
+                break;
+            default:
+                console.log('error');
+            }
+
+        //stimulus formated in html
+        var html_stimulus =
+          '<table>\
+            <tbody>\
+              <tr>\
+                <td></td>\
+                <td><span>' + en_word +' </span></td>\
+                <td></td>\
+              </tr>\
+              <tr></tr>\
+              <tr>\
+                <td>\
+                  <p id = "option" > f) ' + swa_words[0] + '</p>\
+                  <p></p>\
+                  <p id = "option" > &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; v) ' + swa_words[1] + '</p>\
+                </td>\
+                <td></td>\
+                <td/>\
+                  <p id = "option" > j) ' + swa_words[3] + '</p>\
+                  <p></p>\
+                  <p id = "option" > n) ' + swa_words[2] + '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</p>\
+                </td>\
+              </tr>\
+            </tbody>\
+          </table>';
+
+        //Display English word w/ 4 Swahili options
+        var multi_choice_block_phase5 = {
+            type : jsPsychHtmlKeyboardResponse,
+            stimulus: html_stimulus,
+            choices : ['f' , 'v' , 'n', 'j'],
+            //trial_duration: 10,
+            data: {en_word: en_word, options: swa_words, swa_word: correct_swa_word, correct_answer: correct_answer,useful_data: true, phase: 5},
+            on_finish: function(data){ // Check if answer is correct
+                var accuracy = false;
+                if( data.correct_answer == data.response){
+                    accuracy = true;
+                }
+                data.input_answer =  data.response; // Add given answer to the dataset
+                // add input word to dataset
+                switch(data.input_answer){
+                  case 'f':
+                    data.input_word = data.options[0]
+                    console.log(data.input_word);
+                    break;
+                  case 'v':
+                    data.input_word = data.options[1];
+                    console.log(data.input_word);
+
+                    break;
+                  case 'n':
+                    data.input_word = data.options[2];
+                    console.log(data.input_word);
+
+                    break;
+                  case 'j':
+                    data.input_word = data.options[3];
+                    console.log(data.input_word);
+
+                    break;
+                  default:
+                    console.log('fault');
+                }
+                data.accuracy = accuracy;// Add accuracy to the dataset
+            }
+        }
+
+        //Display certainty rating scale
+        var cert_rating_phase5 = {
+            type: jsPsychHtmlSliderResponse,
+            stimulus: ' &nbsp; &nbsp; &nbsp; &nbsp; How certain were you of your answer? &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </p>',
+            labels: ['very uncertain', 'uncertain', 'neutral', 'certain', 'very certain'],
+            min: 1,
+            max: 5,
+            step: 1,
+            slider_start: 3,
+            require_movement: true,
+            //trial_duration: 10,
+            data: {useful_data: true, phase:5},
+            on_finish: function(data){
+              jsPsych.data.get().addToLast({certainty: data.response});
+            }
+        };
+
+        // Push stimulus on the timeline
+        if (keep_phase5) {
+          timeline.push(multi_choice_block_phase5, cert_rating_phase5);
+        } else {
+          ;
+        }   
+    }
+
+
+///////////////////////////////////////////////////////////
+///////////////////END AND STORE DATA//////////////////////
+///////////////////////////////////////////////////////////
+
+/// save data
+var call_function = {
+  type: jsPsychCallFunction,
+  async: true,
+  func: function(done){
+    var filename = "Data_participant_" + participant_number
+    var filedata = jsPsych.data.get().filter({useful_data: true}).ignore('stimulus').ignore('internal_node_id').ignore('key_press').ignore('time_elapsed').ignore('response').ignore('useful_data').csv()
+    var xhr = new XMLHttpRequest()
+    xhr.open('POST', 'write_data.php')
+    xhr.setRequestHeader('Content-Type', 'application/json')
+    xhr.onload = function(){
+      done()
+    }
+    xhr.send(JSON.stringify({filename: filename, filedata: filedata}))
+  }
+}
+timeline.push(call_function)
+
+
+var instructions_end = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: "<span  id= 'instructie' >You have completed the whole experiment! Thank you for your participation!<br><br>"+
+      "Press any key to end this experiment.</span>",
+    post_trial_gap: 100,
+    data: {useful_data: false}
+  };
+
+  if (keep_instruct) {
+    timeline.push(instructions_end);
+  } else {
+    ;
+  }
+
+jsPsych.run(timeline);
+
+</script>
+</html>
