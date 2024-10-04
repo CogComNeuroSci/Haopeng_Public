@@ -6,6 +6,9 @@ This is the script for preprocessing
 "formal_analysis.R"
 This is the script for formal analysis
 
+“interaction_effect.R”
+This is the script to get the pure positive feedback effect and negative feedback effect. 
+
 "formal_analysis_pure_feedback_learning.py"
 This is the script to plot pure feedback learning without initial learning.
 
@@ -23,3 +26,6 @@ This is the preprocessed data
 
 "data_preprocess_e1.csv"
 This is the preprocessed data of Experiment 1.
+
+"data_preprocess_e2.csv"
+This is the preprocessed data of Experiment 2.
