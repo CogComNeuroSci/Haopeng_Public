@@ -4,19 +4,40 @@
 
 rm(list=ls())
 
-
-### import the modules
+##########################
+### import the modules ###
+##########################
 library(lme4)
 library(bruceR)
 library(caret)
 library(car)
 
+#############################
+######### functions #########
+#############################
+## equivalence test
+equil_test <- function (beta, se, lower=-0.1, upper=0.1, n) {
+  # t value for the lower bound
+  t_l <- (beta - lower) / se
+  # t value for the upper bound
+  t_u <- (beta - upper) / se
+  # p value of the lower bound
+  p_l <- pt(t_l, df=n-1, lower.tail=FALSE)
+  p_u <- pt(t_u, df=n-1, lower.tail=TRUE)
+  
+  print(sprintf('t(lower)=%f, p(lower)=%f, t(upper)=%f, p(upper)=%f', t_l, p_l, t_u, p_u))
+}
 
+####################
+##### settings #####
+####################
 ## data without removing subjects?
 full_data <- FALSE
 binary = FALSE
 
-### import the data
+########################
+### import the data ####
+########################
 data <- read.csv('data_preprocess.csv')
 
 ## full data? binary?
@@ -40,8 +61,9 @@ if (full_data & binary) {
   data$accuracy = data$accuracy_continuous
 }
 
-
-### preprocess
+###################
+### preprocess ####
+###################
 ## reward has been encoded as 0,1
 ## confidence has been encoded as 0-1
 ## delete the correct items in the pretest
@@ -54,13 +76,9 @@ data$srpe <- data$srpe - 0
 data$urpe <- data$urpe - 0.5
 data$learning_method <- data$learning_method - 0.5
 
-#data$reward <- scale(data$reward)
-#data$confidence <- scale(data$confidence)
-#data$srpe <- scale(data$srpe)
-#data$urpe <- scale(data$urpe)
-#data$learning_method <- scale(data$learning_method)
-
-### formal analysis 1: all the data
+#######################
+### formal analysis ###
+#######################
 ## model 1: testing effect
 data1 <- copy(data)
 
@@ -99,7 +117,9 @@ if (binary) {
 
 HLM_summary(model)
 Anova(model, type=3)
-mean(data3[data3$test==1, 'accuracy'])
+
+equil_test(0.007, 0.022, n=61)
+
 ## model4: testing (r3=1) vs testing (r3=0)
 data4 <- copy(data)
 data4 <- data4[data4$test==1,]

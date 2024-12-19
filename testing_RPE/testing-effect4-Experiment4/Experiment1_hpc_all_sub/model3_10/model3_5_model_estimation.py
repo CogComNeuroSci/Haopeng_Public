@@ -20,7 +20,7 @@ binary = False
 # full data
 full = False
 # filter
-filt = False
+filt = True
 
 ### prepare the data        
 ## prelearning (phase 2)
@@ -115,8 +115,13 @@ for sub in range(X_phase2_3d.shape[0]):
     W3 = model_learning(b1=parameters[1], b2=parameters[2], slope=parameters[3], bias=parameters[4], W=W2.copy(), X=X_phase3, Y_feed=Y_feed_phase3, Y_options=Y_options_phase3, TvS=TvS_phase3, Reward3=Reward3_phase3, swa_words=swa_words)
     
     # model testing
+    Y_pred = model_testing(slope=parameters[3], bias=parameters[4], W=W2.copy(), X=X_testing, Y_options=Y_options_testing, swa_words=swa_words)
+    Model_accuracy1 = Y_pred[Y_feed_testing==1]
+    
     Y_pred = model_testing(slope=parameters[3], bias=parameters[4], W=W3.copy(), X=X_testing, Y_options=Y_options_testing, swa_words=swa_words)
-    Model_accuracy = Y_pred[Y_feed_testing==1]
+    Model_accuracy2 = Y_pred[Y_feed_testing==1]
+    
+    Model_accuracy = Model_accuracy2
     
     retain = Model_accuracy.shape[0]
     data = pd.DataFrame({'Pars':Pars.flatten()[0:retain], 'individual_binary_acc': InAccB.flatten()[0:retain], 'individual_continuous_acc': InAccC.flatten()[0:retain], 'Reward2':Reward2.flatten()[0:retain], 'Reward3':Reward3.flatten()[0:retain], 'RPE':RPE.flatten()[0:retain], 'TvS': TvS.flatten()[0:retain], 'Model_accuracy': Model_accuracy[0:retain], 'Human_accuracy': Human_accuracy.flatten()[0:retain]})
@@ -192,19 +197,19 @@ fig2.savefig('figs/human_performance.tif', dpi=300)
 
 
 #%% testing effect in model
-parameters_all.columns = ['index', 'a', 'b', 'slope', 'bias', 'log_like', 'AIC', 'success', 'Pars']
-parameters_all = parameters_all[['a', 'b', 'slope', 'bias', 'log_like', 'AIC', 'Pars']]
+parameters_all.columns = ['index', 'a', 'b1', 'b2', 'slope', 'bias', 'log_like', 'AIC', 'success', 'Pars']
+parameters_all = parameters_all[['a', 'b1', 'b2', 'slope', 'bias', 'log_like', 'AIC', 'Pars']]
 
 data_all = data_all.loc[data_all['Reward2']==0, :]
 data_all = data_all.merge(parameters_all, how='left')
 
-data_all = data_all.groupby(by=['Pars', 'a', 'b', 'slope', 'bias', 'TvS'])[['Model_accuracy', 'Human_accuracy']].mean()
+data_all = data_all.groupby(by=['Pars', 'a', 'b1', 'b2', 'slope', 'bias', 'TvS'])[['Model_accuracy', 'Human_accuracy']].mean()
 data_all = data_all.reset_index()
 
-data_all = data_all.pivot(columns=['TvS'], index=['Pars', 'a', 'b', 'slope', 'bias'], values=['Model_accuracy', 'Human_accuracy'])
+data_all = data_all.pivot(columns=['TvS'], index=['Pars', 'a', 'b1', 'b2', 'slope', 'bias'], values=['Model_accuracy', 'Human_accuracy'])
 data_all = data_all.reset_index()
 
-data_all.columns = ['Pars', 'a', 'b', 'slope', 'bias', 'Model_accuracy_study', 'Model_accuracy_test', 'Human_accuracy_study', 'Human_accuracy_test']
+data_all.columns = ['Pars', 'a', 'b1', 'b2', 'slope', 'bias', 'Model_accuracy_study', 'Model_accuracy_test', 'Human_accuracy_study', 'Human_accuracy_test']
 data_all['model_test_effect'] = data_all['Model_accuracy_test'] - data_all['Model_accuracy_study']
 data_all['human_test_effect'] = data_all['Human_accuracy_test'] - data_all['Human_accuracy_study']
 

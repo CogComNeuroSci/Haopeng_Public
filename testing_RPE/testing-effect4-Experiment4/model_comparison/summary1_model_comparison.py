@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 
 ### settings
 which_data = 'continuous' # full, binary, continuous
-which_model = 'part' # all or part
+which_model = 'all' # all or part
 
 
 ### models

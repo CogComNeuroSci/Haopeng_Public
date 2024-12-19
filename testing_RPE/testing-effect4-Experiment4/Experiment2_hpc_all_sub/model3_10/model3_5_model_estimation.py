@@ -20,7 +20,7 @@ binary = False
 # full data
 full = False
 # filter
-filt = False
+filt = True
 
 ### prepare the data        
 ## prelearning (phase 2)
@@ -192,19 +192,19 @@ fig2.savefig('figs/human_performance.tif', dpi=300)
 
 
 #%% testing effect in model
-parameters_all.columns = ['index', 'a', 'b', 'slope', 'bias', 'log_like', 'AIC', 'success', 'Pars']
-parameters_all = parameters_all[['a', 'b', 'slope', 'bias', 'log_like', 'AIC', 'Pars']]
+parameters_all.columns = ['index', 'a', 'b1', 'b2', 'slope', 'bias', 'log_like', 'AIC', 'success', 'Pars']
+parameters_all = parameters_all[['a', 'b1', 'b2', 'slope', 'bias', 'log_like', 'AIC', 'Pars']]
 
 data_all = data_all.loc[data_all['Reward2']==0, :]
 data_all = data_all.merge(parameters_all, how='left')
 
-data_all = data_all.groupby(by=['Pars', 'a', 'b', 'slope', 'bias', 'TvS'])[['Model_accuracy', 'Human_accuracy']].mean()
+data_all = data_all.groupby(by=['Pars', 'a', 'b1', 'b2', 'slope', 'bias', 'TvS'])[['Model_accuracy', 'Human_accuracy']].mean()
 data_all = data_all.reset_index()
 
-data_all = data_all.pivot(columns=['TvS'], index=['Pars', 'a', 'b', 'slope', 'bias'], values=['Model_accuracy', 'Human_accuracy'])
+data_all = data_all.pivot(columns=['TvS'], index=['Pars', 'a', 'b1', 'b2', 'slope', 'bias'], values=['Model_accuracy', 'Human_accuracy'])
 data_all = data_all.reset_index()
 
-data_all.columns = ['Pars', 'a', 'b', 'slope', 'bias', 'Model_accuracy_study', 'Model_accuracy_test', 'Human_accuracy_study', 'Human_accuracy_test']
+data_all.columns = ['Pars', 'a', 'b1', 'b2', 'slope', 'bias', 'Model_accuracy_study', 'Model_accuracy_test', 'Human_accuracy_study', 'Human_accuracy_test']
 data_all['model_test_effect'] = data_all['Model_accuracy_test'] - data_all['Model_accuracy_study']
 data_all['human_test_effect'] = data_all['Human_accuracy_test'] - data_all['Human_accuracy_study']
 
@@ -212,7 +212,6 @@ if not os.path.exists('data/model'):
     os.mkdir('data/model')
 
 data_all.to_csv('data/model/model_simulation.csv')
-
 
 
 

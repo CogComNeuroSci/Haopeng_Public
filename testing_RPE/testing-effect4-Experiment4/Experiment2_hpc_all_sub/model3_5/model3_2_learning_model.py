@@ -30,14 +30,7 @@ import pandas as pd
 def logist(x, slope=1, bias=0):
     return 1/(1+np.exp(-slope*(x-bias)))
     
-"""
-a = 1
-W = np.zeros([90, 360])
-X = np.load('data/E1_data_construction/data_phase2/X.npy')
-Y_conf = np.load('data/E1_data_construction/data_phase2/Y_conf.npy')
-X = X[0, :, :]
-Y_conf = Y_conf[0, :, :]
-"""
+
 
 ### function: model prelearning
 def model_prelearning(a, W, X, Y_conf):
@@ -50,34 +43,10 @@ def model_prelearning(a, W, X, Y_conf):
     
     return W
 
-"""
-a = 1
-X = np.load('data/E1_data_construction/data_phase3/X.npy')
-Y_conf = np.load('data/E1_data_construction/data_phase3/Y_conf.npy')
-X = X[0, :, :]
-Y_conf = Y_conf[0, :, :]
-
-
-b = 1
-slope=1
-bias=1
-X = np.load('data/E1_data_construction/data_phase3/X.npy')
-Y_feed = np.load('data/E1_data_construction/data_phase3/Y_feed.npy')
-Y_options = np.load('data/E1_data_construction/data_phase3/Y_options.npy')
-TvS = np.load('data/E1_data_construction/data_phase3/TS.npy')
-Reward3 = np.load('data/E1_data_construction/data_phase3/Reward3.npy')
-swa_words = np.load('data/E1_data_construction/data_phase3/column_y.npy')
-X = X[0, :, :]
-Y_feed = Y_feed[0, :, :]
-Y_options = Y_options[0, :, :]
-TvS = TvS[0, :, :]
-Reward3 = Reward3[0, :, :]
-"""
-
 
 
 ### function: model formal learning
-def model_learning(b, slope, bias, W, X, Y_feed, Y_options, TvS, Reward3, swa_words):
+def model_learning(b, slope, bias, W, X, Y_feed, Y_options, TvS, Reward3, swa_words, extract_pe=False):
     ### Options 
     Options = np.sort(Y_options, axis=1)
     
@@ -120,18 +89,12 @@ def model_learning(b, slope, bias, W, X, Y_feed, Y_options, TvS, Reward3, swa_wo
     W_update = W_update_3d.sum(axis=0)
     W += W_update
     
-    return W
+    if extract_pe:
+        PE = Y_feed - Y_pred
+        return W, PE
+    else:    
+        return W
 
-
-"""
-slope = 1
-bias = 1
-X = np.load('data/E1_data_construction/data_phase4/X.npy')
-Y_options = np.load('data/E1_data_construction/data_phase4/Y_options.npy')
-swa_words = np.load('data/E1_data_construction/data_phase4/column_y.npy')
-X = X[0, :, :]
-Y_options = Y_options[0, :, :]
-"""
 
 
 ### function: model testing

@@ -5,15 +5,31 @@
 ### clear
 rm(list=ls())
 
-
-### import the library
+##########################
+### import the library ###
+##########################
 library(bruceR)
 library(lme4)
 library(caret)
 library(car)
 
+#########################
+###### functions ########
+#########################
+## equivalence test
+equil_test <- function (beta, se, lower=-0.1, upper=0.1, n) {
+  # t value for the lower bound
+  t_l <- (beta - lower) / se
+  # t value for the upper bound
+  t_u <- (beta - upper) / se
+  # p value of the lower bound
+  p_l <- pt(t_l, df=n-1, lower.tail=FALSE)
+  p_u <- pt(t_u, df=n-1, lower.tail=TRUE)
+  
+  print(sprintf('t(lower)=%f, p(lower)=%f, t(upper)=%f, p(upper)=%f', t_l, p_l, t_u, p_u))
+}
 
-## data without removing subjects?
+### data without removing subjects?
 full_data <- FALSE
 binary = FALSE
 
@@ -100,7 +116,10 @@ if (binary) {
 
 HLM_summary(model)
 Anova(model, type=3)
-mean(data3[data3$test==1, 'accuracy'])
+
+# equivalence test
+equil_test(-0.021, 0.020, n=66)
+
 ## model4: testing (r3=1) vs testing (r3=0)
 data4 <- copy(data)
 data4 <- data4[data4$test==1,]
@@ -113,7 +132,6 @@ if (binary) {
 
 HLM_summary(model)
 Anova(model, type=3)
-
 
 
 ## confidence effect in negative feedback conditions

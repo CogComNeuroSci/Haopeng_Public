@@ -1,8 +1,9 @@
 "summary1_model_comparison.py"
 model comparison
 
-"summary2_learning_rates_testing_effect"
+"summary2_simulation_test_effect"
 which learning rates could predict the magnitude of the testing effect?
+test effect in each model.
 
 "data"
 data for statistical analysis

@@ -20,7 +20,9 @@ binary = False
 # full data
 full = False
 # filter
-filt = False
+filt = True
+# extract PE?
+extract_pe = True
 
 ### prepare the data        
 ## prelearning (phase 2)
@@ -33,6 +35,7 @@ Y_conf_phase3_3d = np.load('data/E1_data_construction/data_phase3/Y_conf.npy')
 
 ## formal learning (phase 3)
 Y_feed_phase3_3d = np.load('data/E1_data_construction/data_phase3/Y_feed.npy')
+Y_choice_phase3_3d = np.load('data/E1_data_construction/data_phase3/Y_choice.npy')
 Y_options_phase3_3d = np.load('data/E1_data_construction/data_phase3/Y_options.npy')
 TvS_phase3_3d = np.load('data/E1_data_construction/data_phase3/TS.npy')
 Reward3_phase3_3d = np.load('data/E1_data_construction/data_phase3/Reward3.npy')
@@ -47,6 +50,7 @@ Reward2_3d = np.load('data/E1_data_construction/data_phase4/Reward2.npy')
 Reward3_3d = np.load('data/E1_data_construction/data_phase4/Reward3.npy')
 RPE_3d = np.load('data/E1_data_construction/data_phase4/RPE.npy')
 TvS_3d = np.load('data/E1_data_construction/data_phase4/TS.npy')
+en_words = np.load('data/E1_data_construction/data_phase4/column_x.npy', allow_pickle=True).astype('str')
 
 if binary:
     Human_accuracy_3d = np.load('data/E1_data_construction/data_phase4/AccuraciesB.npy')
@@ -79,6 +83,7 @@ for sub in range(X_phase2_3d.shape[0]):
     Y_conf_phase3 = Y_conf_phase3_3d[sub, :, :]
     # formal learning (phase3)
     Y_feed_phase3 = Y_feed_phase3_3d[sub, :, :]
+    Y_choice_phase3 = Y_choice_phase3_3d[sub, :, :]
     Y_options_phase3 = Y_options_phase3_3d[sub, :, :]
     TvS_phase3 = TvS_phase3_3d[sub, :, :]
     Reward3_phase3 = Reward3_phase3_3d[sub, :, :]
@@ -112,18 +117,41 @@ for sub in range(X_phase2_3d.shape[0]):
     W2 = model_prelearning(a=parameters[0], W=W1.copy(), X=X_phase3, Y_conf=Y_conf_phase3)
     
     # formal learning
-    W3 = model_learning(b=parameters[1], slope=parameters[2], bias=parameters[3], W=W2.copy(), X=X_phase3, Y_feed=Y_feed_phase3, Y_options=Y_options_phase3, TvS=TvS_phase3, Reward3=Reward3_phase3, swa_words=swa_words)
+    if not extract_pe:
+        W3 = model_learning(b=parameters[1], slope=parameters[2], bias=parameters[3], W=W2.copy(), X=X_phase3, Y_feed=Y_feed_phase3, Y_options=Y_options_phase3, TvS=TvS_phase3, Reward3=Reward3_phase3, swa_words=swa_words)
+    else:
+        W3, PE = model_learning(b=parameters[1], slope=parameters[2], bias=parameters[3], W=W2.copy(), X=X_phase3, Y_feed=Y_feed_phase3, Y_options=Y_options_phase3, TvS=TvS_phase3, Reward3=Reward3_phase3, swa_words=swa_words, extract_pe=True)
     
-    # model testing
+    ## extract PE in phase 3
+    # PE
+    PE = PE[Y_choice_phase3==1]
+    # english inputs in Phase 3
+    en_matrix = np.repeat(en_words[np.newaxis, :], 90, axis=0)
+    en_input_phase3 = en_matrix[X_phase3==1]
+    # PE data
+    data_pe = pd.DataFrame({'en_word': en_input_phase3, 'PE': PE})
+    
+    ## en_input in Phase 4
+    en_input_test = en_matrix[X_testing==1]
+    
+    ## model testing
+    Y_pred, Choices = model_testing(slope=parameters[2], bias=parameters[3], W=W2.copy(), X=X_testing, Y_options=Y_options_testing, swa_words=swa_words)
+    initial_learning = Y_pred[Y_feed_testing==1]
+    
     Y_pred, Choices = model_testing(slope=parameters[2], bias=parameters[3], W=W3.copy(), X=X_testing, Y_options=Y_options_testing, swa_words=swa_words)
     Model_accuracy = Y_pred[Y_feed_testing==1]
-        
-    retain = Model_accuracy.shape[0]
-    data = pd.DataFrame({'Pars':Pars.flatten()[0:retain], 'individual_binary_acc': InAccB.flatten()[0:retain], 'individual_continuous_acc': InAccC.flatten()[0:retain], 'Reward2':Reward2.flatten()[0:retain], 'Reward3':Reward3.flatten()[0:retain], 'RPE':RPE.flatten()[0:retain], 'TvS': TvS.flatten()[0:retain], 'Model_accuracy': Model_accuracy[0:retain], 'Human_accuracy': Human_accuracy.flatten()[0:retain]})
+    
+    pure_learning = Model_accuracy - initial_learning
+    
+    data = pd.DataFrame({'Pars':Pars.flatten(), 'en_word': en_input_test, 'individual_binary_acc': InAccB.flatten(), 'individual_continuous_acc': InAccC.flatten(), 'Reward2':Reward2.flatten(), 'Reward3':Reward3.flatten(), 'RPE':RPE.flatten(), 'TvS': TvS.flatten(), 'Model_accuracy': Model_accuracy, 'Initial_learning': initial_learning, 'Pure_learning': pure_learning, 'Human_accuracy': Human_accuracy.flatten()})
+    data = data.merge(data_pe, how='left', on=['en_word'])
     
     data_all = pd.concat([data_all, data], axis=0)
     
     parameters_all.loc[sub, 'Pars'] = Pars[1]
+
+### save data
+data_all.to_csv('data/model/data_pe.csv')
 
 ### plot
 plt.rcParams['font.size'] = 24

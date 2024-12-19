@@ -9,14 +9,11 @@ This is the script for formal analysis
 “interaction_effect.R”
 This is the script to get the pure positive feedback effect and negative feedback effect. 
 
-"formal_analysis_pure_feedback_learning.py"
+"plot_feedback_learning.py"
 This is the script to plot pure feedback learning without initial learning.
 
 "plot.py"
 This is the script to plot figures.
-
-"demographic_data"
-This is the basic information of subjects (age, gender).
 
 "raw_data"
 This is the raw data

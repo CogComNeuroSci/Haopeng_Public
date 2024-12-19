@@ -20,7 +20,7 @@ import os
 ###############################
 ######### data ################
 ###############################
-full_data = True
+full_data = False
 binary = False
 ## filter stratagy
 filt = 'correct' # correct, no, high_conf
@@ -84,7 +84,7 @@ plt.rcParams.update({
     })
 
 ##### first subplot #######
-fig1, ax1 = plt.subplots(dpi=300)
+fig1, ax1 = plt.subplots(figsize=[6, 4])
 plt.tight_layout()
 
 ## bar plot
@@ -130,7 +130,7 @@ else:
 
 
 ##### second subplot #######
-fig2, ax2 = plt.subplots()
+fig2, ax2 = plt.subplots(figsize=[6, 4])
 plt.tight_layout()
 
 ## bar plot
@@ -183,3 +183,77 @@ if full_data:
     fig2.savefig('figs/positive_confidence_all_sub.tif', dpi=300)
 else:
     fig2.savefig('figs/positive_confidence_deletion.tif', dpi=300)
+    
+    
+#%%
+##################################################
+############# plot: test vs study ################
+##################################################
+
+if filt == 'correct':
+    data_all_plot = data_all.copy()
+    data_all_plot = data_all_plot.loc[data_all_plot['reward2']==0, :]
+elif filt == 'no':
+    data_all_plot = data_all.copy()
+elif filt == 'high_conf':
+    data_all_plot = data_all.copy()
+    data_all_plot = data_all_plot.loc[data_all_plot['confidence2']<=0.5, :]
+
+## preprocess
+data_all_plot = data_all_plot.groupby(by=['participant', 'reward', 'learning_method'])['accuracy'].mean()
+data_all_plot = data_all_plot.reset_index()
+data_all_plot.columns = ['Pars', 'Reward', 'Testing Vs Studying', 'Human accuracy']
+
+data_all_plot['Human accuracy'] = data_all_plot['Human accuracy'] * 100
+data_all_plot = data_all_plot.sort_values(by=['Testing Vs Studying'], ascending=False)
+data_all_plot['Testing Vs Studying'].replace([0, 1], ['Study', 'Test'], inplace=True)
+
+
+######## setting #############
+######## setting #############
+plt.rcParams.update({
+    'font.size': 16,
+    'axes.labelsize': 16,
+    'xtick.labelsize': 16,
+    'ytick.labelsize': 16
+    })
+
+##### first subplot #######
+fig, ax = plt.subplots(figsize=[3, 8], dpi=300)
+plt.tight_layout(pad=2)
+
+## bar plot
+data_plot = data_all_plot.copy()
+
+palette = {'Test':(1.0, 0.4980392156862745, 0.054901960784313725), 'Study':(0.12156862745098039, 0.4666666666666667, 0.7058823529411765)}
+
+sns.barplot(data=data_plot, x='Testing Vs Studying', y='Human accuracy',
+                    edgecolor = 'black',
+                    facecolor = 'white',
+                    errorbar='se',
+                    linewidth=3,
+                    dodge=False,
+                    width=0.4,
+                    ax=ax)
+
+i = 0
+for patch in ax.patches:
+    if i == 0:
+        edge_color = palette['Test']
+    else:
+        edge_color = palette['Study']  # Get the edge color from the palette
+    patch.set_edgecolor(edge_color)  # Set the edge color
+    i+=1
+
+## overlay point
+sns.stripplot(data=data_plot, x='Testing Vs Studying', y='Human accuracy',
+                   palette=palette,
+                   dodge=False,
+                   ax=ax)
+
+ax.set_xlabel('')
+ax.set_yticks(np.arange(0, 110, 20))
+fig.subplots_adjust(left=0.28, top=0.95, bottom=0.12, right=0.95)
+
+fig.savefig('figs/test_effect.jpg', dpi=300)
+

@@ -21,7 +21,7 @@ binary = False
 # full data
 full = False
 # filt
-filt = False
+filt = True
 
 ### prepare the data        
 ## prelearning (phase 2)

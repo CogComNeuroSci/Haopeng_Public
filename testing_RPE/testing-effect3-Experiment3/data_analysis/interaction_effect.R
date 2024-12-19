@@ -79,6 +79,24 @@ data$feedback <- data$feedback - 0.5
 #data$urpe <- scale(data$urpe)
 #data$learning_method <- scale(data$learning_method)
 
+
+### formal analysis: feedback * test
+data_formal <- copy(data)
+
+if (binary) {
+  model <- glmer(data=data_formal, formula=accuracy~feedback*learning_method+reward+confidence+(learning_method+reward+confidence|participant), family=binomial)
+  null_model <- glmer(data=data_formal, formula=accuracy~feedback+learning_method+reward+confidence+(learning_method+reward+confidence|participant), family=binomial)
+} else {
+  model <- lmer(data=data_formal, formula=accuracy~feedback*learning_method+reward+confidence+(learning_method+reward+confidence|participant))
+  null_model <- lmer(data=data_formal, formula=accuracy~feedback+learning_method+reward+confidence+(learning_method+reward+confidence|participant))
+}
+
+# omnibus test
+anova(null_model, model)
+
+HLM_summary(model)
+Anova(model)
+
 ### formal analysis: all Experiments
 ## Interaction
 data_formal <- data[data$test==1,]
@@ -118,7 +136,7 @@ Anova(model, type=3)
 
 
 
-### formal analysis: Experiments 1 and 2
+### formal analysis: Experiments 1 and 3
 ## Interaction
 data_formal <- data[data$Experiment!=2,]
 data_formal <- data_formal[data_formal$test==1,]
@@ -151,6 +169,21 @@ if (binary) {
   model <- glmer(data=data_simple, formula=accuracy~feedback+(1|participant), family=binomial)
 } else {
   model <- lmer(data=data_simple, formula=accuracy~feedback+(1|participant))
+}
+
+HLM_summary(model)
+Anova(model, type=3)
+
+
+
+### formal analysis: reward * test in Exp 1 and 2
+## Interaction
+data_formal <- data[data$Experiment!=3,]
+
+if (binary) {
+  model <- glmer(data=data_formal, formula=accuracy~reward:learning_method+(reward+learning_method|participant), family=binomial)
+} else {
+  model <- lmer(data=data_formal, formula=accuracy~reward:learning_method+(reward+learning_method|participant))
 }
 
 HLM_summary(model)

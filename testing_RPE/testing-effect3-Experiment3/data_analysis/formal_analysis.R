@@ -4,13 +4,29 @@
 
 rm(list=ls())
 
-
-### import the modules
+##########################
+### import the modules ###
+##########################
 library(lme4)
 library(bruceR)
 library(caret)
 library(car)
 
+#########################
+###### functions ########
+#########################
+## equivalence test
+equil_test <- function (beta, se, lower=-0.1, upper=0.1, n) {
+  # t value for the lower bound
+  t_l <- (beta - lower) / se
+  # t value for the upper bound
+  t_u <- (beta - upper) / se
+  # p value of the lower bound
+  p_l <- pt(t_l, df=n-1, lower.tail=FALSE)
+  p_u <- pt(t_u, df=n-1, lower.tail=TRUE)
+  
+  print(sprintf('t(lower)=%f, p(lower)=%f, t(upper)=%f, p(upper)=%f', t_l, p_l, t_u, p_u))
+}
 
 ## data without removing subjects?
 full_data <- FALSE
@@ -54,13 +70,9 @@ data$srpe <- data$srpe - 0
 data$urpe <- data$urpe - 0.5
 data$learning_method <- data$learning_method - 0.5
 
-#data$reward <- scale(data$reward)
-#data$confidence <- scale(data$confidence)
-#data$srpe <- scale(data$srpe)
-#data$urpe <- scale(data$urpe)
-#data$learning_method <- scale(data$learning_method)
-
-### formal analysis 1: all the data
+##################################################
+############ formal analysis #####################
+##################################################
 ## model 1: testing effect
 data1 <- copy(data)
 
@@ -73,14 +85,16 @@ if (binary) {
 HLM_summary(model)
 Anova(model, type=3)
 
+equil_test(0.019, 0.054, n=41)
+
 ## model2: testing (r3=1) vs studying
 data2 <- copy(data)
 data2 <- data2[data2$reward3==1,]
 
 if (binary) {
-  model <- glmer(data=data2, formula=accuracy~learning_method+(learning_method+reward+confidence|participant), family=binomial)
+  model <- glmer(data=data2, formula=accuracy~learning_method++(learning_method|participant), family=binomial)
 } else {
-  model <- lmer(data=data2, formula=accuracy~learning_method+(learning_method+reward+confidence|participant))
+  model <- lmer(data=data2, formula=accuracy~learning_method+(learning_method|participant))
 }
 
 HLM_summary(model)
@@ -112,5 +126,4 @@ if (binary) {
 
 HLM_summary(model)
 Anova(model, type=3)
-
 

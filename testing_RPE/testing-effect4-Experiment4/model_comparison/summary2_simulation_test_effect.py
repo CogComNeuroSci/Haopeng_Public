@@ -33,35 +33,32 @@ for e in [1, 2]:
 data_all.to_csv('data/model_simulation.csv')
 
 #%% model simulation (test effect)
-plt.rcParams['font.size'] = 24
+plt.rcParams['font.size'] = 22
 plt.rcParams['legend.fontsize'] = 15
+
+data_all['model_test_effect'] = data_all['model_test_effect'] * 100
 
 # Experiment 1
 data_plot = data_all.loc[data_all['Experiment']==1, :]
-fig = sns.catplot(data=data_plot, x='model', y='model_test_effect', hue='predictive_learning', kind='bar'
+fig = sns.catplot(data=data_plot, x='model', y='model_test_effect', kind='bar', color='gray'
                   ,legend=False
                   ,aspect=2
-                  ,palette={'Without PL': 'red', 'With PL': 'green'}
                   ,dodge=False)
 fig.ax.axhline(y=0, color='black', linestyle='-')
-plt.legend(loc='upper right')
 fig.set_xlabels('Model')
-fig.set_ylabels('Testing effect (Model)')
+fig.set_ylabels('Testing effect (Model) %')
 fig.savefig('figures/model_based_test_effect_e1.tif', dpi=300)
 
 # Experiment 2
 data_plot = data_all.loc[data_all['Experiment']==2, :]
-fig = sns.catplot(data=data_plot, x='model', y='model_test_effect', hue='predictive_learning', kind='bar'
+fig = sns.catplot(data=data_plot, x='model', y='model_test_effect', kind='bar', color='gray'
                   ,legend=False
                   ,aspect=2
-                  ,palette={'Without PL': 'red', 'With PL': 'green'}
                   ,dodge=False)
 fig.ax.axhline(y=0, color='black', linestyle='-')
-plt.legend(loc='upper right')
 fig.set_xlabels('Model')
-fig.set_ylabels('Testing effect (Model)')
+fig.set_ylabels('Testing effect (Model) %')
 fig.savefig('figures/model_based_test_effect_e2.tif', dpi=300)
-
 
 
 

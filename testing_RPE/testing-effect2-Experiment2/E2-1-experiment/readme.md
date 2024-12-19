@@ -8,9 +8,3 @@ This folder contains the experiment code of the first day.
 "Experiment-day2"
 This folder contains the experiment code of the second day.
 
-"pilot-data"
-This folder contains the data from myself.
-
-"subjects"
-The demographic data of participants
-
